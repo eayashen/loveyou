@@ -584,37 +584,33 @@ function ProposalChapter({ sessionId }: { sessionId: string }) {
             তবে আমি বিশ্বাস করি, যা কিছু হয় ভালোর জন্যই হয় এবং আল্লাহ্‌ পরম পরিকল্পনাকারী।
           </p>
 
-          {/* Relevant image in the text */}
-          <div className="my-6 flex justify-center">
-            <div className="relative w-full max-w-[220px] rounded-2xl overflow-hidden shadow-lg shadow-rose-200/30 aspect-[3/4]">
-              <Image
-                src="/love-images/chapter4-everything.png"
-                alt="একসাথে স্বপ্ন"
-                fill
-                className="object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-white/20 to-transparent" />
-            </div>
-          </div>
-
           <p className="text-rose-700/90 leading-relaxed text-base">
             তোমার মনের অনুভূতি যা-ই হোক না কেন, নির্দ্বিধায় আমাকে জানাতে পারো।
           </p>
           <p className="text-rose-700/90 leading-relaxed text-base">
-            তোমার সিদ্ধান্ত হয়তো আমার মনের মতো হবে, হয়তো হবে না—কিন্তু যেটাই হোক, আমি সবসময় তোমার সিদ্ধান্তের প্রতি শ্রদ্ধাশীল থাকব।
+            তোমার সিদ্ধান্ত হয়তো আমার মনের মতো হবে, হয়তো হবে না।
+          </p>
+          <p className="text-rose-700/90 leading-relaxed text-base">
+            কিন্তু যেটাই হোক, আমি সবসময় তোমার সিদ্ধান্তের প্রতি শ্রদ্ধাশীল থাকব।
           </p>
           <p className="text-rose-700/90 leading-relaxed text-base">
             আমার আরেকটা ছোট অনুরোধ থাকবে—যদি বিষয়টা তোমার পছন্দ না হয়ে থাকে, তবে আমাকে ক্ষমা করে দিয়ো।
           </p>
           <p className="text-rose-700/90 leading-relaxed text-base">
-            এই কথার প্রভাব যেন পরবর্তীতে আমাদের সম্পর্ক কিংবা তোমার পরিবারের ওপর না পড়ে। আর আমি চাইব, এই অনুভূতিটা তুমি তোমার নিজের মধ্যেই সীমাবদ্ধ রাখো এবং পরিবারের সাথে শেয়ার না করো।
+            এই কথার প্রভাব যেন পরবর্তীতে আমাদের সম্পর্ক কিংবা তোমার পরিবারের ওপর না পড়ে।
+          </p>
+          <p className="text-rose-700/90 leading-relaxed text-base">
+            আর আমি চাইব, এই অনুভূতিটা তুমি তোমার নিজের মধ্যেই সীমাবদ্ধ রাখো এবং পরিবারের সাথে শেয়ার না করো।
           </p>
           <p className="text-rose-700/90 leading-relaxed text-base">
             তুমি যদি আমার সাথে কথা বলতে চাও, তবে{" "}
             <span className="text-rose-500 font-medium">nusaiba.chat</span>{" "}
             ওয়েবসাইটে গিয়ে পাসওয়ার্ড হিসেবে তোমার নাম{" "}
             <span className="text-rose-500 font-medium">nusaiba</span>{" "}
-            লিখে লগইন করে মেসেজ দিয়ো; আমি সেই প্ল্যাটফর্মে তোমার অপেক্ষায় থাকব।
+            লিখে লগইন করে মেসেজ দিয়ো।
+          </p>
+          <p className="text-rose-700/90 leading-relaxed text-base">
+            আমি সেই প্ল্যাটফর্মে তোমার অপেক্ষায় থাকব।
           </p>
         </motion.div>
 
