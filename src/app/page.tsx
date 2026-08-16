@@ -375,43 +375,28 @@ const chapters: Chapter[] = [
   },
   {
     id: 3,
-    title: "Our Journey Together",
-    subtitle: "Every step has been worth it...",
+    title: "তোমার জন্য অপেক্ষা",
+    subtitle: "দুনিয়া ভাবুক যা ভাবার আছে...",
     image: "/love-images/chapter3-journey.png",
     bgGradient: "from-orange-50 via-amber-50 to-rose-50",
     content: (
       <div className="space-y-6">
+        <div className="flex justify-center pt-2 text-center">
+          <span className="font-cursive text-xl text-rose-400 leading-relaxed">
+            দুনিয়া ভাবুক যা ভাবার আছে<br />
+            তবে আমিতো ভাববো শুধু তোমাকে<br />
+            ভেবে ভেবে এই ভাবে সময় আমার পেরিয়ে।
+          </span>
+        </div>
         <p className="text-rose-700/90 leading-relaxed text-base">
-          Every day with you has been an adventure. From late-night talks to
-          morning coffees, from silly moments to deep conversations — we&apos;ve built
-          something truly special together.
+          আমার ইচ্ছা আছে উচ্চশিক্ষার জন্য দেশের বাইরে যাওয়ার। কিন্তু মায়ের কথা ভেবে এগোতে পারছি না, কারণ পাসপোর্টে মায়ের নামের সংশোধনীটুকু এখনো করানো হয়নি।
         </p>
-        <div className="space-y-4 pl-2">
-          {[
-            { time: "The beginning", memory: "Those nervous first words that turned into endless conversations" },
-            { time: "Getting closer", memory: "The moment I realized you were becoming my favorite person" },
-            { time: "Growing together", memory: "Every challenge that only made us stronger" },
-            { time: "Right now", memory: "Looking at you and knowing I want this forever" },
-          ].map((item, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 15 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.15, duration: 0.5 }}
-              viewport={{ once: true }}
-              className="relative pl-6 border-l-2 border-rose-200/60"
-            >
-              <div className="absolute -left-[7px] top-0 w-3 h-3 rounded-full bg-rose-300 shadow-sm" />
-              <p className="font-cursive text-rose-500 text-lg">{item.time}</p>
-              <p className="text-rose-700/80 text-sm mt-1 leading-relaxed">
-                {item.memory}
-              </p>
-            </motion.div>
-          ))}
-        </div>
-        <div className="flex justify-center pt-2">
-          <span className="font-cursive text-2xl text-rose-400">And the best is yet to come.</span>
-        </div>
+        <p className="text-rose-700/90 leading-relaxed text-base">
+          মা প্রায়ই বিয়ের কথা বলেন। আমি মাকে বলেছি— "আমি মনে মনে একজনকে পছন্দ করি। তাঁকে কোনোদিন বলতে পারলে বলব, আর না হয় তোমার কথাই মেনে নেব।" তোমাকে পাওয়ার এই নীরব অপেক্ষাটা আমার নিজের ইচ্ছেতেই।
+        </p>
+        <p className="text-rose-700/90 leading-relaxed text-base">
+          আমি জানি, তোমার সামনে এখন অ্যাডমিশন জার্নি, তোমার অনেক বড় বড় স্বপ্ন রয়েছে। আমি কখনোই তোমার স্বপ্নের পথে বাধা হতে চাই না, বরং তোমার পাশে থেকে তোমাকে অলওয়েজ সাপোর্ট করতে চাই। তুমি যদি এখন পড়াশোনা নিয়ে ব্যস্ত থাকতে চাও কিংবা এই মুহূর্তে প্রস্তুত না থাকো, আমি তোমার জন্য অপেক্ষা করতে রাজি আছি। এমনকি তুমি যদি চার বছর পড়াশোনা শেষ করে তারপর কোনো সিদ্ধান্ত নিতে চাও, আমি এতদিন ধরেও তোমার জন্য অপেক্ষা করব। এই সময়ে আমি নিজেকে আরও ভালোভাবে তৈরি করে ফেলব— হয় উচ্চশিক্ষার জন্য দেশের বাইরে যাওয়া, কিংবা দেশে সরকারি চাকরির মতো আরও ভালো কিছু করার প্রস্তুতি নেওয়া।
+        </p>
       </div>
     ),
   },
