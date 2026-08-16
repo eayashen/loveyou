@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef, useMemo, useSyncExternalStore } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight, Lock, Eye, EyeOff } from "lucide-react";
+import { ChevronLeft, ChevronRight, Lock, Eye, EyeOff, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -442,8 +442,8 @@ const chapters: Chapter[] = [
   },
   {
     id: 5,
-    title: "The Question",
-    subtitle: "The most important words I&apos;ll ever say...",
+    title: "তোমার মতামতের অপেক্ষায়",
+    subtitle: "জানি না কী বলবে তুমি এটা শুনে...",
     image: "/love-images/chapter5-proposal.png",
     bgGradient: "from-pink-50 via-rose-50 to-fuchsia-50",
     content: null,
@@ -518,18 +518,9 @@ function CelebrationPopup({ open, onClose }: { open: boolean; onClose: () => voi
 /* ------------------------------------------------------------------ */
 /*  PROPOSAL CHAPTER (Special)                                        */
 /* ------------------------------------------------------------------ */
-function ProposalChapter({ sessionId, onSayYes }: { sessionId: string; onSayYes: () => void }) {
-  const [showPopup, setShowPopup] = useState(false);
+function ProposalChapter({ sessionId }: { sessionId: string }) {
   const [message, setMessage] = useState("");
   const messageDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const handleYes = () => {
-    setShowPopup(true);
-  };
-
-  const handlePopupClose = useCallback(() => {
-    setShowPopup(false);
-  }, []);
 
   // Debounced message save
   const handleMessageChange = useCallback(
@@ -545,6 +536,13 @@ function ProposalChapter({ sessionId, onSayYes }: { sessionId: string; onSayYes:
     [sessionId]
   );
 
+  const handleSend = useCallback(() => {
+    if (message.trim()) {
+      trackMessage(sessionId, message);
+      setMessage("");
+    }
+  }, [sessionId, message]);
+
   // Save message on unmount if there's content
   useEffect(() => {
     return () => {
@@ -557,71 +555,70 @@ function ProposalChapter({ sessionId, onSayYes }: { sessionId: string; onSayYes:
       <SparklesOverlay />
 
       <div className="space-y-8 text-center">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-        >
-          <p className="text-rose-700/90 leading-relaxed text-base mb-8">
-            I&apos;ve been wanting to say this for a long time, and there&apos;s no
-            better moment than now. You&apos;ve made every single day brighter,
-            every moment more meaningful, and every dream worth chasing.
-          </p>
-        </motion.div>
+        <div className="flex justify-center pt-2 text-center">
+          <span className="font-cursive text-xl text-rose-400 leading-relaxed">
+            জানি না কী বলবে তুমি এটা শুনে<br />
+            তবুও ভালোবেসে যাবো চুপি সারে<br />
+            জানিয়ে দিয়ো যদি ভালোবাসো তুমি<br />
+            সাদা-মাটা প্রেমের চিঠিতে
+          </span>
+        </div>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.5 }}
-          className="py-6"
+          transition={{ duration: 0.8, delay: 0.3 }}
+          className="text-left"
         >
-          <p className="font-cursive text-3xl md:text-4xl text-rose-500 mb-2">
-            Will you be mine?
+          <p className="text-rose-700/90 leading-relaxed text-base">
+            হয়তো মনের কথাগুলো খুব এলোমেলোভাবে বলে ফেললাম। আসলে এতদিন ধরে নিজের মধ্যে জমিয়ে রাখা কথাগুলো আজ একসাথে বলে ফেলতে চেয়েছি।
           </p>
-          <p className="text-rose-400/70 text-sm font-serif">
-            Forever and always
+          <p className="text-rose-700/90 leading-relaxed text-base">
+            তবে আমি বিশ্বাস করি, যা কিছু হয় ভালোর জন্যই হয় এবং আল্লাহ্‌ পরম পরিকল্পনাকারী।
           </p>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, scale: 0.5 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6, delay: 0.8, type: "spring" }}
-        >
-          <Button
-            onClick={handleYes}
-            className="h-14 px-10 rounded-full bg-gradient-to-r from-rose-400 via-pink-500 to-fuchsia-500 hover:from-rose-500 hover:via-pink-600 hover:to-fuchsia-600 text-white font-cursive text-xl shadow-xl shadow-rose-300/50 transition-all duration-300 hover:shadow-2xl hover:shadow-rose-400/60 hover:scale-105"
-          >
-            <motion.span
-              animate={{ scale: [1, 1.05, 1] }}
-              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-            >
-              Yes!
-            </motion.span>
-          </Button>
+          <p className="text-rose-700/90 leading-relaxed text-base">
+            তোমার মনের অনুভূতি যা-ই হোক না কেন, নির্দ্বিধায় আমাকে জানাতে পারো। তোমার সিদ্ধান্ত হয়তো আমার মনের মতো হবে, হয়তো হবে না—কিন্তু যেটাই হোক, আমি সবসময় তোমার সিদ্ধান্তের প্রতি শ্রদ্ধাশীল থাকব।
+          </p>
+          <p className="text-rose-700/90 leading-relaxed text-base">
+            আমার আরেকটা ছোট অনুরোধ থাকবে—যদি বিষয়টা তোমার পছন্দ না হয়ে থাকে, তবে আমাকে ক্ষমা করে দিয়ো। এই কথার প্রভাব যেন পরবর্তীতে আমাদের সম্পর্ক কিংবা তোমার পরিবারের ওপর না পড়ে। আর আমি চাইব, এই অনুভূতিটা তুমি তোমার নিজের মধ্যেই সীমাবদ্ধ রাখো এবং পরিবারের সাথে শেয়ার না করো।
+          </p>
+          <p className="text-rose-700/90 leading-relaxed text-base">
+            তুমি যদি আমার সাথে কথা বলতে চাও, তবে{" "}
+            <span className="font-cursive text-rose-500">nusaiba.chat</span>{" "}
+            ওয়েবসাইটে গিয়ে পাসওয়ার্ড হিসেবে তোমার নাম{" "}
+            <span className="font-cursive text-rose-500">nusaiba</span>{" "}
+            লিখে লগইন করে মেসেজ দিয়ো; আমি সেই প্ল্যাটফর্মে তোমার অপেক্ষায় থাকব।
+          </p>
         </motion.div>
 
         {/* Textarea section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 1 }}
+          transition={{ duration: 0.6, delay: 0.6 }}
           className="pt-4"
         >
           <p className="font-cursive text-lg text-rose-500 mb-3">
             Say something about me
           </p>
-          <Textarea
-            value={message}
-            onChange={(e) => handleMessageChange(e.target.value)}
-            placeholder="Write whatever is in your heart..."
-            className="min-h-[100px] rounded-2xl border-rose-200 bg-white/60 backdrop-blur-sm focus:bg-white/90 text-rose-800 placeholder:text-rose-300 font-serif text-sm resize-none"
-          />
+          <div className="relative">
+            <Textarea
+              value={message}
+              onChange={(e) => handleMessageChange(e.target.value)}
+              placeholder="Write whatever..."
+              className="min-h-[100px] rounded-2xl border-rose-200 bg-white/60 backdrop-blur-sm focus:bg-white/90 text-rose-800 placeholder:text-rose-300 font-serif text-sm resize-none pr-12"
+            />
+            <button
+              onClick={handleSend}
+              disabled={!message.trim()}
+              className="absolute right-3 bottom-3 p-2 rounded-xl bg-rose-400 hover:bg-rose-500 text-white shadow-sm shadow-rose-300/40 transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed hover:scale-105"
+              aria-label="Send message"
+            >
+              <Send className="w-4 h-4" />
+            </button>
+          </div>
         </motion.div>
       </div>
-
-      {/* Celebration popup */}
-      <CelebrationPopup open={showPopup} onClose={handlePopupClose} />
     </div>
   );
 }
@@ -673,7 +670,7 @@ function CelebrationScreen() {
 /* ------------------------------------------------------------------ */
 /*  CHAPTER PAGE                                                      */
 /* ------------------------------------------------------------------ */
-function StoryPage({ onSayYes }: { onSayYes: () => void }) {
+function StoryPage() {
   const [currentChapter, setCurrentChapter] = useState(0);
   const [direction, setDirection] = useState(1);
   const sessionIdRef = useRef("");
@@ -829,7 +826,7 @@ function StoryPage({ onSayYes }: { onSayYes: () => void }) {
               transition={{ delay: 0.4, duration: 0.6 }}
             >
               {isProposal ? (
-                <ProposalChapter sessionId={sessionIdRef.current} onSayYes={onSayYes} />
+                <ProposalChapter sessionId={sessionIdRef.current} />
               ) : (
                 <div className="glass rounded-3xl p-6 md:p-8 shadow-lg shadow-rose-100/20 border border-rose-100/30">
                   {chapter.content}
@@ -889,15 +886,10 @@ function StoryPage({ onSayYes }: { onSayYes: () => void }) {
 /* ------------------------------------------------------------------ */
 export default function LovePage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [showCelebration, setShowCelebration] = useState(false);
-
-  if (showCelebration) {
-    return <CelebrationScreen />;
-  }
 
   if (!isLoggedIn) {
     return <LoginScreen onLogin={() => setIsLoggedIn(true)} />;
   }
 
-  return <StoryPage onSayYes={() => setShowCelebration(true)} />;
+  return <StoryPage />;
 }
