@@ -52,3 +52,10 @@ prompt
 server.log
 # Skills directory
 /skills/
+
+# Dev-only files
+tool-results/
+upload/
+db/*.db
+db/*.db-journal
+claude*
