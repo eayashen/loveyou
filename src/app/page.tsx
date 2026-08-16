@@ -451,6 +451,43 @@ const chapters: Chapter[] = [
   },
   {
     id: 5,
+    title: "এই অনুভূতিটা আমার কাছে নতুন",
+    subtitle: "তোমাকে নিয়ে যতই ভাবি...",
+    image: "/love-images/chapter5-new.png",
+    bgGradient: "from-rose-50 via-pink-50 to-amber-50",
+    content: (
+      <div className="space-y-6">
+        <div className="flex justify-center pt-2 text-center">
+          <span className="font-cursive text-xl text-rose-400 leading-relaxed">
+            তোমাকে নিয়ে যতই ভাবি<br />
+            মনে হয় এই অনুভূতি আরও গভীরে<br />
+            শুধু তোমার জন্যই বুঝি<br />
+            ভালোবাসা কতটা সুন্দর
+          </span>
+        </div>
+        <p className="text-rose-700/90 leading-relaxed text-base">
+          এতগুলো ছোট ছোট স্বপ্ন বুনতে গিয়ে একটা বিষয় বারবার বুঝতে পারছি—আমার এই অনুভূতি শুধু ভালোলাগা নয়, এটা অনেক গভীর থেকে এসেছে।
+        </p>
+        <p className="text-rose-700/90 leading-relaxed text-base">
+          আগে কখনো কাউকে নিয়ে এতভাবে ভাবিনি। কাউকে নিয়ে স্বপ্ন দেখা, কারো সাথে ভবিষ্যৎ কল্পনা করা—এসব আমার কাছে একদম নতুন।
+        </p>
+        <p className="text-rose-700/90 leading-relaxed text-base">
+          শীতের সকালে তোমার সাথে ব্যাডমিন্টন খেলা, বিকেলে ফুসকা খাওয়া, অফিস শেষে তোমার সাথে গল্প করা—এই ছোট ছোট স্বপ্নগুলোই আমাকে বুঝিয়েছে যে আমি তোমাকে কতটা চাই।
+        </p>
+        <p className="text-rose-700/90 leading-relaxed text-base">
+          তোমাকে নিয়ে যখন ভাবি, মনে হয় যেন সব কিছু স্বাভাবিক। যেন তুমি আমার জীবনের একটা অংশ হয়েই ছিলে।
+        </p>
+        <p className="text-rose-700/90 leading-relaxed text-base">
+          জানি না ভবিষ্যতে কী হবে, কিন্তু একটা কথা নিশ্চিত—তোমাকে ভালোবাসার এই অনুভূতিটা আমার জীবনের সবচেয়ে সুন্দর অনুভূতি।
+        </p>
+        <p className="text-rose-700/90 leading-relaxed text-base">
+          আর এই সুন্দর অনুভূতিটা শুধু তোমার জন্যই। তুমিই আমার জীবনে এই পরিবর্তনটা এনেছ।
+        </p>
+      </div>
+    ),
+  },
+  {
+    id: 6,
     title: "তোমার মতামতের অপেক্ষায়",
     subtitle: "জানি না কী বলবে তুমি এটা শুনে...",
     image: "/love-images/chapter5-proposal.png",
