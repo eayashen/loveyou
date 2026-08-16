@@ -330,38 +330,47 @@ const chapters: Chapter[] = [
   },
   {
     id: 2,
-    title: "What I Adore About You",
-    subtitle: "A love letter in progress...",
+    title: "তোমাকে ভালো লাগার গল্প",
+    subtitle: "ওয়েট, না, প্রথম দেখাতে ভালোবাসিনি আমি!",
     image: "/love-images/chapter2-adore.png",
     bgGradient: "from-amber-50 via-rose-50 to-pink-50",
     content: (
-      <div className="space-y-5">
-        {[
-          "The way your eyes light up when you talk about something you love",
-          "Your laugh — the real one, when you can&apos;t hold it in anymore",
-          "How you care so deeply about everyone around you",
-          "The little things you do that you think nobody notices (but I always do)",
-          "Your strength, your kindness, your beautiful soul",
-          "The way you make every ordinary moment feel extraordinary",
-          "Your imperfect perfection — every flaw makes you more beautiful to me",
-        ].map((item, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ delay: i * 0.1, duration: 0.4 }}
-            viewport={{ once: true }}
-            className="flex items-start gap-3"
+      <div className="space-y-6">
+        <p className="text-rose-700/90 leading-relaxed text-base">
+          ওয়েট, না, প্রথম দেখাতে ভালোবাসিনি আমি!
+          <br />
+          তবে ধীরে-ধীরে জাগলো এই অনুভূতি।
+          <br />
+          আমি সারাদিন ভেবে এই ভাবেই
+          <br />
+          যায় আমার রাত পেরিয়ে।
+        </p>
+        <p className="text-rose-700/90 leading-relaxed text-base">
+          তোমাকে যতটুকু দেখেছি, মনে হয়েছে তুমি একজন পারফেক্ট এবং অত্যন্ত রুচিশীল মানুষ। তোমার মিষ্টি আর মার্জিত ব্যক্তিত্বই আস্তে আস্তে আমার মনে তোমার জন্য একটা গভীর ভালো লাগা তৈরি করেছে।
+        </p>
+        <p className="text-rose-700/90 leading-relaxed text-base">
+          তোমার সাথে আমার অনেক মিল খুঁজে পাই। তুমি চুপচাপ থাকতে পছন্দ করো, তোমাকে কেউ ডিস্টার্ব না করুক এটা তুমি চাও, তোমার পছন্দ খুবই সিম্পল, আর তুমি কোনো কিছু নিয়ে অতিরিক্ত টেনশন করো না—'যা হওয়ার হবে' ভেবে খুব ঠান্ডা থাকতে পারো। তোমার এই স্বভাবগুলো আমার খুব ভালো লাগে।
+        </p>
+        <p className="text-rose-700/90 leading-relaxed text-base">
+          মনে আছে? ক্লাসে তোমাদের একটা কাপলদের ভিডিও দেখিয়েছিলাম? তাদের ভিডিও আমার সামনে আসলেই কেবল তোমার কথাই মনে পড়ে। কোনো এক অজানা কারণে আমি এমন একটা জায়গায় আটকে গেছি, যেখান থেকে অন্য কোনো দিকে আর মন দিতে পারি না।
+        </p>
+        <p className="text-rose-700/90 leading-relaxed text-base">
+          কিছুদিন আগে 'কাছের মানুষ দূরে থুইয়া' সিনেমাটা দেখার সময়ও মনে হচ্ছিল—সিনেমার সেই দুজন মানুষের গল্পের মতো যদি আমাদের গল্পটাও হতো!
+          <a
+            href="https://bit.ly/KacherManus"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block mt-2 text-rose-500 underline underline-offset-2 hover:text-rose-600 transition-colors"
           >
-            <span className="text-rose-300 mt-1 shrink-0 w-2.5 h-2.5 rounded-full bg-rose-300/60" />
-            <p className="text-rose-700/90 text-base leading-relaxed">
-              {item}
-            </p>
-          </motion.div>
-        ))}
-        <div className="flex justify-center pt-4">
-          <span className="font-cursive text-2xl text-rose-400">And so much more...</span>
-        </div>
+            সিনেমাটা দেখতে এখানে ক্লিক করো
+          </a>
+        </p>
+        <p className="text-rose-700/90 leading-relaxed text-base">
+          শুধু তুমি নও, তোমার সুন্দর পরিবারটিকেও আমার খুব ভালো লাগে।
+        </p>
+        <p className="text-rose-700/90 leading-relaxed text-base">
+          ছোটবেলা থেকেই আমি পরিবারে যে সুদৃঢ় বন্ধনটা মিস করেছি, তোমাদের মধ্যে তা দেখে মন ভরে যায়। মনে হয়, তোমার মতো একজন পাশে থাকলে জীবনটা কতই না সুন্দর আর গুছানো হতে পারে! যেখানে একজন আরেকজনকে সব সময় সাপোর্ট করবে।
+        </p>
       </div>
     ),
   },
