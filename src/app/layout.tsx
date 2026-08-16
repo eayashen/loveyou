@@ -16,7 +16,7 @@ const playfairDisplay = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "For You, With All My Love ❤",
+  title: "For You, With All My Love",
   description: "A love story written just for you.",
   icons: {
     icon: "/love-images/login-bg.png",
