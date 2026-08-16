@@ -486,14 +486,6 @@ const chapters: Chapter[] = [
       </div>
     ),
   },
-  {
-    id: 6,
-    title: "তোমার মতামতের অপেক্ষায়",
-    subtitle: "জানি না কী বলবে তুমি এটা শুনে...",
-    image: "/love-images/chapter5-proposal.png",
-    bgGradient: "from-pink-50 via-rose-50 to-fuchsia-50",
-    content: null,
-  },
 ];
 
 /* ------------------------------------------------------------------ */
