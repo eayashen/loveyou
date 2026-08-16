@@ -402,39 +402,41 @@ const chapters: Chapter[] = [
   },
   {
     id: 4,
-    title: "You&apos;re My Everything",
-    subtitle: "Words will never be enough...",
+    title: "একসাথে স্বপ্ন দেখার ইচ্ছা",
+    subtitle: "বলবো, বলবো করে বলা হয়নি...",
     image: "/love-images/chapter4-everything.png",
     bgGradient: "from-rose-50 via-fuchsia-50 to-amber-50",
     content: (
       <div className="space-y-6">
-        <p className="text-rose-700/90 leading-relaxed text-base">
-          You are my first thought in the morning and my last before I sleep.
-          You are the calm in my storm, the warmth on my coldest days,
-          and the reason I believe in forever.
-        </p>
-        <div className="bg-white/50 rounded-2xl p-6 border border-rose-100/40">
-          <p className="font-cursive text-xl text-rose-500 text-center leading-relaxed">
-            &ldquo;In a world full of chaos,
-            <br />
-            you are my peace.
-            <br />
-            In a life full of questions,
-            <br />
-            you are my answer.
-            <br />
-            In a heart full of dreams,
-            <br />
-            you are the only one I dream about.&rdquo;
-          </p>
+        <div className="flex justify-center pt-2 text-center">
+          <span className="font-cursive text-xl text-rose-400 leading-relaxed">
+            বলবো, বলবো করে বলা হয়নি<br />
+            কপালে যাই থাকুক না কেন বলবো ভাবছি<br />
+            এই কিছু কথা মনে যা আগে বলা হয়নি<br />
+            ছিলাম আমি লুকিয়ে এতটা দিন
+          </span>
         </div>
         <p className="text-rose-700/90 leading-relaxed text-base">
-          I don&apos;t need a perfect love story. I just need one with you.
-          And that, my darling, is already the most beautiful story ever written.
+          কখনো তোমাকে বিরক্ত করার কোনো উদ্দেশ্য আমার নেই। বরং আমার খুব ইচ্ছা—যদি আমরা দুজন একসাথে প্রস্তুতি নিয়ে দেশের বাইরে যেতে পারি! তুমি তোমার ব্যাচেলর্সের জন্য, আর আমি মাস্টার্সের জন্য।
         </p>
-        <div className="flex justify-center pt-2">
-          <span className="font-cursive text-2xl text-rose-400">You make my heart complete.</span>
-        </div>
+        <p className="text-rose-700/90 leading-relaxed text-base">
+          তবে দিনশেষে, তোমার ইচ্ছা এবং তোমার পছন্দই আমার কাছে সবচেয়ে আগে। তোমাকে কোনো জটিল পরিস্থিতির মুখোমুখি করা আমার উদ্দেশ্য নয়।
+        </p>
+        <p className="text-rose-700/90 leading-relaxed text-base">
+          আমি শুধু তোমার জীবনকে আরও সহজ আর সুন্দর করতে চাই। এতটুকু ভরসা দিতে পারি—আমার পাশে থাকলে তুমি কখনো একঘেয়েমি অনুভব করবে না।
+        </p>
+        <p className="text-rose-700/90 leading-relaxed text-base">
+          আমার তোমার জন্য অনেক কিছুই করতে ইচ্ছা করে। জানি না এইরকম অনুভূতি আগে হয়নি, কিন্তু ভালোই লাগে।
+        </p>
+        <p className="text-rose-700/90 leading-relaxed text-base">
+          কত শত ছোট ছোট স্বপ্ন বুনেছি তোমাকে নিয়ে—শীতের সকালে একসাথে ব্যাডমিন্টন খেলা, কোনো এক বিকেলে ফুসকা খাওয়া, অফিস শেষ করে এসে তোমার সাথে গল্প করা, তোমাকে কাজের মাঝে একটু সাহায্য করা, অফিসের সময়ে দুজনে মিলে একসাথে সিনেমা দেখা।
+        </p>
+        <p className="text-rose-700/90 leading-relaxed text-base">
+          ভীষণ ইচ্ছে করে তোমাকে সাথে নিয়ে আমার প্রিয় ক্যাম্পাসটা ঘুরে দেখাই, যা আগের চেয়ে এখন অনেক বেশি সুন্দর হয়েছে।
+        </p>
+        <p className="text-rose-700/90 leading-relaxed text-base">
+          আমি সবসময় আল্লাহর উপর বিশ্বাস রাখি, আর আলহামদুলিল্লাহ্‌ তিনি সবসময় সবকিছুর উত্তম ব্যবস্থা করে দেন। যেমন নতুন বাসায় আসার পর খরচ অনেকটা বেড়ে গিয়েছিল, কিন্তু ঠিক এক মাসের মাথায় আমার প্রোমোশন হয়ে গেল! আল্লাহর এই রহমত আমাকে নতুন করে আশা ও সাহস দেয়।
+        </p>
       </div>
     ),
   },
