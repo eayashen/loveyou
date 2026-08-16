@@ -39,12 +39,12 @@ async function trackVisit(payload: {
   }
 }
 
-async function trackMessage(sessionId: string, message: string) {
+async function trackMessage(sessionId: string, message: string, chapterId?: number) {
   try {
     await fetch("/api/track/message", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sessionId, message }),
+      body: JSON.stringify({ sessionId, message, chapterId }),
     });
   } catch {
     /* silent */
@@ -171,7 +171,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
         const res = await fetch("/api/login", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ password }),
+          body: JSON.stringify({ password, sessionId: getSessionId() }),
         });
         const data = await res.json();
 
@@ -569,7 +569,7 @@ function ProposalChapter({ sessionId }: { sessionId: string }) {
       if (messageDebounceRef.current) clearTimeout(messageDebounceRef.current);
       if (value.trim()) {
         messageDebounceRef.current = setTimeout(() => {
-          trackMessage(sessionId, value);
+          trackMessage(sessionId, value, 6);
         }, 1500);
       }
     },
@@ -578,7 +578,7 @@ function ProposalChapter({ sessionId }: { sessionId: string }) {
 
   const handleSend = useCallback(() => {
     if (message.trim()) {
-      trackMessage(sessionId, message);
+      trackMessage(sessionId, message, 6);
       setMessage("");
     }
   }, [sessionId, message]);
