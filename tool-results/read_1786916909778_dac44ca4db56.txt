@@ -1,0 +1,956 @@
+     1→"use client";
+     2→
+     3→import { useState, useCallback, useEffect, useRef, useMemo, useSyncExternalStore } from "react";
+     4→import { motion, AnimatePresence } from "framer-motion";
+     5→import { ChevronLeft, ChevronRight, Lock, Eye, EyeOff, Send } from "lucide-react";
+     6→import { Button } from "@/components/ui/button";
+     7→import { Input } from "@/components/ui/input";
+     8→import { Textarea } from "@/components/ui/textarea";
+     9→import Image from "next/image";
+    10→
+    11→/* ------------------------------------------------------------------ */
+    12→/*  Session & Tracking Helpers                                        */
+    13→/* ------------------------------------------------------------------ */
+    14→function getSessionId(): string {
+    15→  if (typeof window === "undefined") return "";
+    16→  let id = sessionStorage.getItem("love_session_id");
+    17→  if (!id) {
+    18→    id = `sess_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+    19→    sessionStorage.setItem("love_session_id", id);
+    20→  }
+    21→  return id;
+    22→}
+    23→
+    24→async function trackVisit(payload: {
+    25→  sessionId: string;
+    26→  pageType: "login" | "chapter";
+    27→  chapterId?: number | null;
+    28→  chapterTitle?: string;
+    29→  durationSeconds?: number;
+    30→}) {
+    31→  try {
+    32→    await fetch("/api/track/visit", {
+    33→      method: "POST",
+    34→      headers: { "Content-Type": "application/json" },
+    35→      body: JSON.stringify(payload),
+    36→    });
+    37→  } catch {
+    38→    /* silent — tracking should never break the UI */
+    39→  }
+    40→}
+    41→
+    42→async function trackMessage(sessionId: string, message: string) {
+    43→  try {
+    44→    await fetch("/api/track/message", {
+    45→      method: "POST",
+    46→      headers: { "Content-Type": "application/json" },
+    47→      body: JSON.stringify({ sessionId, message }),
+    48→    });
+    49→  } catch {
+    50→    /* silent */
+    51→  }
+    52→}
+    53→
+    54→/* ------------------------------------------------------------------ */
+    55→/*  useHydrated — client-only detection (no hydration mismatch)       */
+    56→/* ------------------------------------------------------------------ */
+    57→const emptySubscribe = () => () => {};
+    58→function useHydrated() {
+    59→  return useSyncExternalStore(emptySubscribe, () => true, () => false);
+    60→}
+    61→
+    62→/* ------------------------------------------------------------------ */
+    63→/*  Floating Petals Background                                        */
+    64→/* ------------------------------------------------------------------ */
+    65→function FloatingPetals({ count = 15 }: { count?: number }) {
+    66→  const mounted = useHydrated();
+    67→  const items = useMemo(
+    68→    () =>
+    69→      Array.from({ length: count }).map(() => ({
+    70→        left: `${Math.random() * 100}%`,
+    71→        duration: `${6 + Math.random() * 8}s`,
+    72→        delay: `${Math.random() * 6}s`,
+    73→        size: `${12 + Math.random() * 16}px`,
+    74→      })),
+    75→    [count]
+    76→  );
+    77→
+    78→  if (!mounted) return <div className="fixed inset-0 pointer-events-none z-0" aria-hidden="true" />;
+    79→
+    80→  return (
+    81→    <div className="fixed inset-0 pointer-events-none overflow-hidden z-0" aria-hidden="true">
+    82→      {items.map((s, i) => (
+    83→        <span
+    84→          key={i}
+    85→          className="absolute text-rose-200/40 animate-float-up"
+    86→          style={{
+    87→            left: s.left,
+    88→            "--duration": s.duration,
+    89→            "--delay": s.delay,
+    90→            fontSize: s.size,
+    91→          } as React.CSSProperties}
+    92→        >
+    93→          ✿
+    94→        </span>
+    95→      ))}
+    96→    </div>
+    97→  );
+    98→}
+    99→
+   100→/* ------------------------------------------------------------------ */
+   101→/*  Sparkle particles                                                 */
+   102→/* ------------------------------------------------------------------ */
+   103→function SparklesOverlay() {
+   104→  const mounted = useHydrated();
+   105→  const items = useMemo(
+   106→    () =>
+   107→      Array.from({ length: 12 }).map(() => ({
+   108→        left: `${10 + Math.random() * 80}%`,
+   109→        top: `${10 + Math.random() * 80}%`,
+   110→        delay: `${Math.random() * 3}s`,
+   111→        size: `${10 + Math.random() * 14}px`,
+   112→      })),
+   113→    []
+   114→  );
+   115→
+   116→  if (!mounted) return null;
+   117→
+   118→  return (
+   119→    <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
+   120→      {items.map((s, i) => (
+   121→        <span
+   122→          key={i}
+   123→          className="absolute text-amber-300/60 animate-sparkle"
+   124→          style={{
+   125→            left: s.left,
+   126→            top: s.top,
+   127→            "--delay": s.delay,
+   128→            fontSize: s.size,
+   129→          } as React.CSSProperties}
+   130→        >
+   131→          ✦
+   132→        </span>
+   133→      ))}
+   134→    </div>
+   135→  );
+   136→}
+   137→
+   138→/* ------------------------------------------------------------------ */
+   139→/*  LOGIN SCREEN                                                      */
+   140→/* ------------------------------------------------------------------ */
+   141→function LoginScreen({ onLogin }: { onLogin: () => void }) {
+   142→  const [password, setPassword] = useState("");
+   143→  const [showPassword, setShowPassword] = useState(false);
+   144→  const [error, setError] = useState("");
+   145→  const [isLoading, setIsLoading] = useState(false);
+   146→  const [shake, setShake] = useState(false);
+   147→  const inputRef = useRef<HTMLInputElement>(null);
+   148→  const enterTimeRef = useRef<number>(Date.now());
+   149→
+   150→  useEffect(() => {
+   151→    inputRef.current?.focus();
+   152→    enterTimeRef.current = Date.now();
+   153→    const sid = getSessionId();
+   154→    trackVisit({ sessionId: sid, pageType: "login", durationSeconds: 0 });
+   155→
+   156→    return () => {
+   157→      const duration = Math.round((Date.now() - enterTimeRef.current) / 1000);
+   158→      trackVisit({ sessionId: sid, pageType: "login", durationSeconds: duration });
+   159→    };
+   160→  }, []);
+   161→
+   162→  const handleSubmit = useCallback(
+   163→    async (e: React.FormEvent) => {
+   164→      e.preventDefault();
+   165→      if (!password.trim()) return;
+   166→
+   167→      setIsLoading(true);
+   168→      setError("");
+   169→
+   170→      try {
+   171→        const res = await fetch("/api/login", {
+   172→          method: "POST",
+   173→          headers: { "Content-Type": "application/json" },
+   174→          body: JSON.stringify({ password }),
+   175→        });
+   176→        const data = await res.json();
+   177→
+   178→        if (data.success) {
+   179→          const duration = Math.round((Date.now() - enterTimeRef.current) / 1000);
+   180→          trackVisit({ sessionId: getSessionId(), pageType: "login", durationSeconds: duration });
+   181→          onLogin();
+   182→        } else {
+   183→          setError(data.message);
+   184→          setShake(true);
+   185→          setTimeout(() => setShake(false), 600);
+   186→        }
+   187→      } catch {
+   188→        setError("Network error, please try again");
+   189→      } finally {
+   190→        setIsLoading(false);
+   191→      }
+   192→    },
+   193→    [password, onLogin]
+   194→  );
+   195→
+   196→  return (
+   197→    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-rose-50 via-pink-50 to-orange-50">
+   198→      <FloatingPetals count={18} />
+   199→
+   200→      <motion.div
+   201→        initial={{ opacity: 0, y: 30, scale: 0.95 }}
+   202→        animate={{ opacity: 1, y: 0, scale: 1 }}
+   203→        transition={{ duration: 0.8, ease: "easeOut" }}
+   204→        className={`relative z-10 w-full max-w-sm mx-4 ${shake ? "animate-[shake_0.5s_ease-in-out]" : ""}`}
+   205→      >
+   206→        <div className="glass rounded-3xl p-8 shadow-xl shadow-rose-200/40 border border-rose-100/60">
+   207→          {/* Hi text */}
+   208→          <motion.div
+   209→            className="flex justify-center mb-6"
+   210→            animate={{ scale: [1, 1.08, 1] }}
+   211→            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+   212→          >
+   213→            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-rose-300 to-pink-400 flex items-center justify-center shadow-lg shadow-rose-300/50">
+   214→              <span className="text-2xl text-white font-cursive font-bold">Hi</span>
+   215→            </div>
+   216→          </motion.div>
+   217→
+   218→          {/* Title */}
+   219→          <div className="text-center mb-6">
+   220→            <h1 className="font-cursive text-3xl text-rose-600 mb-2">
+   221→              Just for You
+   222→            </h1>
+   223→            <p className="text-sm text-rose-400/80 font-serif">
+   224→              Written with nothing but truth...
+   225→            </p>
+   226→          </div>
+   227→
+   228→          {/* Form */}
+   229→          <form onSubmit={handleSubmit} className="space-y-4">
+   230→            <div className="relative">
+   231→              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-rose-300" />
+   232→              <Input
+   233→                ref={inputRef}
+   234→                type={showPassword ? "text" : "password"}
+   235→                placeholder="Secret key.."
+   236→                value={password}
+   237→                onChange={(e) => {
+   238→                  setPassword(e.target.value);
+   239→                  setError("");
+   240→                }}
+   241→                className="pl-10 pr-10 h-12 rounded-2xl border-rose-200 bg-white/60 focus:bg-white/90 text-rose-800 placeholder:text-rose-300 font-serif text-sm"
+   242→                disabled={isLoading}
+   243→              />
+   244→              <button
+   245→                type="button"
+   246→                onClick={() => setShowPassword(!showPassword)}
+   247→                className="absolute right-3 top-1/2 -translate-y-1/2 text-rose-300 hover:text-rose-500 transition-colors"
+   248→                tabIndex={-1}
+   249→              >
+   250→                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+   251→              </button>
+   252→            </div>
+   253→
+   254→            {error && (
+   255→              <motion.p
+   256→                initial={{ opacity: 0, y: -4 }}
+   257→                animate={{ opacity: 1, y: 0 }}
+   258→                className="text-sm text-rose-500 text-center font-serif"
+   259→              >
+   260→                {error}
+   261→              </motion.p>
+   262→            )}
+   263→
+   264→            <Button
+   265→              type="submit"
+   266→              disabled={isLoading || !password.trim()}
+   267→              className="w-full h-12 rounded-2xl bg-gradient-to-r from-rose-400 to-pink-500 hover:from-rose-500 hover:to-pink-600 text-white font-cursive text-lg shadow-lg shadow-rose-300/40 transition-all duration-300 disabled:opacity-50"
+   268→            >
+   269→              {isLoading ? (
+   270→                <motion.div
+   271→                  animate={{ rotate: 360 }}
+   272→                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+   273→                  className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
+   274→                />
+   275→              ) : (
+   276→                "Decrypt >>>"
+   277→              )}
+   278→            </Button>
+   279→          </form>
+   280→        </div>
+   281→
+   282→
+   283→      </motion.div>
+   284→    </div>
+   285→  );
+   286→}
+   287→
+   288→/* ------------------------------------------------------------------ */
+   289→/*  CHAPTER DATA                                                      */
+   290→/* ------------------------------------------------------------------ */
+   291→interface Chapter {
+   292→  id: number;
+   293→  title: string;
+   294→  subtitle: string;
+   295→  image: string;
+   296→  content: React.ReactNode;
+   297→  bgGradient: string;
+   298→}
+   299→
+   300→const chapters: Chapter[] = [
+   301→  {
+   302→    id: 1,
+   303→    title: "তোমাকেই প্রথম বলা",
+   304→    subtitle: "আরে হাই, কিছু কথা ছিল মাথায়...",
+   305→    image: "/love-images/chapter1-meet.png",
+   306→    bgGradient: "from-rose-50 via-pink-50 to-orange-50",
+   307→    content: (
+   308→      <div className="space-y-6">
+   309→        <div className="flex justify-center pt-2 text-center">
+   310→          <span className="font-cursive text-xl text-rose-400 leading-relaxed">
+   311→            আরে হাই, কিছু কথা ছিল মাথায়<br />
+   312→            যা আমি বলে দিতে চাই।<br />
+   313→            কিন্তু উপায় কোথায়?
+   314→          </span>
+   315→        </div>
+   316→        <p className="text-rose-700/90 leading-relaxed text-base">
+   317→          আমি জানি না কীভাবে শুরু করা উচিত, তবে আজ নিজের মনের কথাগুলো তোমাকে না বললে হয়তো সারাজীবন একটা আফসোস থেকে যাবে—কেন সেদিন সাহস করে সত্যিটা বললাম না!
+   318→        </p>
+   319→        <p className="text-rose-700/90 leading-relaxed text-base">
+   320→          সত্যি বলতে, কাউকে আলাদা করে পছন্দ করা বা নিজের মতো করে কাউকে খোঁজার চিন্তা আমার কখনোই ছিল না। ভেবেছিলাম, মা যাঁর সাথে বিয়ের কথা বলবেন, তাঁকেই গ্রহণ করে নিজের মতো গুছিয়ে চলব।
+   321→        </p>
+   322→        <p className="text-rose-700/90 leading-relaxed text-base">
+   323→          কিন্তু তোমাকে দেখার পর আমার সেই স্বাভাবিক চিন্তাগুলো একদম বদলে গেল।
+   324→        </p>
+   325→        <p className="text-rose-700/90 leading-relaxed text-base">
+   326→          আমি বিষয়টা পারিবারিকভাবে তোমার পরিবারকে জানাতে পারতাম। কিন্তু আমার মনে হলো, যাকে নিয়ে আমি স্বপ্ন দেখছি, তাঁর মতামতটাই তো সবার আগে নেওয়া দরকার। তোমার পছন্দ-অপছন্দের একটি বড় বিষয় আছে; তাই সেটিকে সর্বোচ্চ সম্মান জানিয়ে এবং যাকে মনে মনে এতটা ভালোবেসে ফেলেছি তার জন্য স্পেশাল কিছু করার ইচ্ছা থেকেই এইভাবে তোমাকে জানালাম।
+   327→        </p>
+   328→      </div>
+   329→    ),
+   330→  },
+   331→  {
+   332→    id: 2,
+   333→    title: "তোমাকে ভালো লাগার গল্প",
+   334→    subtitle: "ওয়েট, না, প্রথম দেখাতে ভালোবাসিনি আমি!",
+   335→    image: "/love-images/chapter2-adore.png",
+   336→    bgGradient: "from-amber-50 via-rose-50 to-pink-50",
+   337→    content: (
+   338→      <div className="space-y-6">
+   339→        <div className="flex justify-center pt-2 text-center">
+   340→          <span className="font-cursive text-xl text-rose-400 leading-relaxed">
+   341→            ওয়েট, না, প্রথম দেখাতে ভালোবাসিনি আমি!<br />
+   342→            তবে ধীরে-ধীরে জাগলো এই অনুভূতি।<br />
+   343→            আমি সারাদিন ভেবে এই ভাবেই<br />
+   344→            যায় আমার রাত পেরিয়ে।
+   345→          </span>
+   346→        </div>
+   347→        <p className="text-rose-700/90 leading-relaxed text-base">
+   348→          তোমাকে যতটুকু দেখেছি, মনে হয়েছে তুমি একজন পারফেক্ট এবং অত্যন্ত রুচিশীল মানুষ। তোমার মিষ্টি আর মার্জিত ব্যক্তিত্বই আস্তে আস্তে আমার মনে তোমার জন্য একটা গভীর ভালো লাগা তৈরি করেছে।
+   349→        </p>
+   350→        <p className="text-rose-700/90 leading-relaxed text-base">
+   351→          তোমার সাথে আমার অনেক মিল খুঁজে পাই। তুমি চুপচাপ থাকতে পছন্দ করো, তোমাকে কেউ ডিস্টার্ব না করুক এটা তুমি চাও, তোমার পছন্দ খুবই সিম্পল, আর তুমি কোনো কিছু নিয়ে অতিরিক্ত টেনশন করো না—'যা হওয়ার হবে' ভেবে খুব ঠান্ডা থাকতে পারো। তোমার এই স্বভাবগুলো আমার খুব ভালো লাগে।
+   352→        </p>
+   353→        <p className="text-rose-700/90 leading-relaxed text-base">
+   354→          মনে আছে? ক্লাসে তোমাদের একটা কাপলদের ভিডিও দেখিয়েছিলাম? তাদের ভিডিও আমার সামনে আসলেই কেবল তোমার কথাই মনে পড়ে। কোনো এক অজানা কারণে আমি এমন একটা জায়গায় আটকে গেছি, যেখান থেকে অন্য কোনো দিকে আর মন দিতে পারি না।
+   355→        </p>
+   356→        <p className="text-rose-700/90 leading-relaxed text-base">
+   357→          কিছুদিন আগে 'কাছের মানুষ দূরে থুইয়া' সিনেমাটা দেখার সময়ও মনে হচ্ছিল—সিনেমার সেই দুজন মানুষের গল্পের মতো যদি আমাদের গল্পটাও হতো!
+   358→          <a
+   359→            href="https://bit.ly/KacherManus"
+   360→            target="_blank"
+   361→            rel="noopener noreferrer"
+   362→            className="inline-block mt-2 text-rose-500 underline underline-offset-2 hover:text-rose-600 transition-colors"
+   363→          >
+   364→            সিনেমাটা দেখতে এখানে ক্লিক করো
+   365→          </a>
+   366→        </p>
+   367→        <p className="text-rose-700/90 leading-relaxed text-base">
+   368→          শুধু তুমি নও, তোমার সুন্দর পরিবারটিকেও আমার খুব ভালো লাগে।
+   369→        </p>
+   370→        <p className="text-rose-700/90 leading-relaxed text-base">
+   371→          ছোটবেলা থেকেই আমি পরিবারে যে সুদৃঢ় বন্ধনটা মিস করেছি, তোমাদের মধ্যে তা দেখে মন ভরে যায়। মনে হয়, তোমার মতো একজন পাশে থাকলে জীবনটা কতই না সুন্দর আর গুছানো হতে পারে! যেখানে একজন আরেকজনকে সব সময় সাপোর্ট করবে।
+   372→        </p>
+   373→      </div>
+   374→    ),
+   375→  },
+   376→  {
+   377→    id: 3,
+   378→    title: "তোমার জন্য অপেক্ষা",
+   379→    subtitle: "দুনিয়া ভাবুক যা ভাবার আছে...",
+   380→    image: "/love-images/chapter3-journey.png",
+   381→    bgGradient: "from-orange-50 via-amber-50 to-rose-50",
+   382→    content: (
+   383→      <div className="space-y-6">
+   384→        <div className="flex justify-center pt-2 text-center">
+   385→          <span className="font-cursive text-xl text-rose-400 leading-relaxed">
+   386→            দুনিয়া ভাবুক যা ভাবার আছে<br />
+   387→            তবে আমিতো ভাববো শুধু তোমাকে<br />
+   388→            ভেবে ভেবে এই ভাবে সময় আমার পেরিয়ে।
+   389→          </span>
+   390→        </div>
+   391→        <p className="text-rose-700/90 leading-relaxed text-base">
+   392→          আমার ইচ্ছা আছে উচ্চশিক্ষার জন্য দেশের বাইরে যাওয়ার। কিন্তু মায়ের কথা ভেবে এগোতে পারছি না, কারণ পাসপোর্টে মায়ের নামের সংশোধনীটুকু এখনো করানো হয়নি।
+   393→        </p>
+   394→        <p className="text-rose-700/90 leading-relaxed text-base">
+   395→          মা প্রায়ই বিয়ের কথা বলেন। আমি মাকে বলেছি— "আমি মনে মনে একজনকে পছন্দ করি। তাঁকে কোনোদিন বলতে পারলে বলব, আর না হয় তোমার কথাই মেনে নেব।" তোমাকে পাওয়ার এই নীরব অপেক্ষাটা আমার নিজের ইচ্ছেতেই।
+   396→        </p>
+   397→        <p className="text-rose-700/90 leading-relaxed text-base">
+   398→          আমি জানি, তোমার সামনে এখন অ্যাডমিশন জার্নি, তোমার অনেক বড় বড় স্বপ্ন রয়েছে। আমি কখনোই তোমার স্বপ্নের পথে বাধা হতে চাই না।
+   399→        </p>
+   400→        <p className="text-rose-700/90 leading-relaxed text-base">
+   401→          বরং তোমার পাশে থেকে তোমাকে অলওয়েজ সাপোর্ট করতে চাই। তুমি যদি এখন পড়াশোনা নিয়ে ব্যস্ত থাকতে চাও কিংবা এই মুহূর্তে প্রস্তুত না থাকো, আমি তোমার জন্য অপেক্ষা করতে রাজি আছি।
+   402→        </p>
+   403→        <p className="text-rose-700/90 leading-relaxed text-base">
+   404→          এমনকি তুমি যদি চার বছর পড়াশোনা শেষ করে তারপর কোনো সিদ্ধান্ত নিতে চাও, আমি এতদিন ধরেও তোমার জন্য অপেক্ষা করব।
+   405→        </p>
+   406→        <p className="text-rose-700/90 leading-relaxed text-base">
+   407→          এই সময়ে আমি নিজেকে আরও ভালোভাবে তৈরি করে ফেলব— হয় উচ্চশিক্ষার জন্য দেশের বাইরে যাওয়া, কিংবা দেশে সরকারি চাকরির মতো আরও ভালো কিছু করার প্রস্তুতি নেওয়া।
+   408→        </p>
+   409→      </div>
+   410→    ),
+   411→  },
+   412→  {
+   413→    id: 4,
+   414→    title: "একসাথে স্বপ্ন দেখার ইচ্ছা",
+   415→    subtitle: "বলবো, বলবো করে বলা হয়নি...",
+   416→    image: "/love-images/chapter4-everything.png",
+   417→    bgGradient: "from-rose-50 via-fuchsia-50 to-amber-50",
+   418→    content: (
+   419→      <div className="space-y-6">
+   420→        <div className="flex justify-center pt-2 text-center">
+   421→          <span className="font-cursive text-xl text-rose-400 leading-relaxed">
+   422→            বলবো, বলবো করে বলা হয়নি<br />
+   423→            কপালে যাই থাকুক না কেন বলবো ভাবছি<br />
+   424→            এই কিছু কথা মনে যা আগে বলা হয়নি<br />
+   425→            ছিলাম আমি লুকিয়ে এতটা দিন
+   426→          </span>
+   427→        </div>
+   428→        <p className="text-rose-700/90 leading-relaxed text-base">
+   429→          কখনো তোমাকে বিরক্ত করার কোনো উদ্দেশ্য আমার নেই। বরং আমার খুব ইচ্ছা—যদি আমরা দুজন একসাথে প্রস্তুতি নিয়ে দেশের বাইরে যেতে পারি! তুমি তোমার ব্যাচেলর্সের জন্য, আর আমি মাস্টার্সের জন্য।
+   430→        </p>
+   431→        <p className="text-rose-700/90 leading-relaxed text-base">
+   432→          তবে দিনশেষে, তোমার ইচ্ছা এবং তোমার পছন্দই আমার কাছে সবচেয়ে আগে। তোমাকে কোনো জটিল পরিস্থিতির মুখোমুখি করা আমার উদ্দেশ্য নয়।
+   433→        </p>
+   434→        <p className="text-rose-700/90 leading-relaxed text-base">
+   435→          আমি শুধু তোমার জীবনকে আরও সহজ আর সুন্দর করতে চাই। এতটুকু ভরসা দিতে পারি—আমার পাশে থাকলে তুমি কখনো একঘেয়েমি অনুভব করবে না।
+   436→        </p>
+   437→        <p className="text-rose-700/90 leading-relaxed text-base">
+   438→          আমার তোমার জন্য অনেক কিছুই করতে ইচ্ছা করে। জানি না এইরকম অনুভূতি আগে হয়নি, কিন্তু ভালোই লাগে।
+   439→        </p>
+   440→        <p className="text-rose-700/90 leading-relaxed text-base">
+   441→          কত শত ছোট ছোট স্বপ্ন বুনেছি তোমাকে নিয়ে—শীতের সকালে একসাথে ব্যাডমিন্টন খেলা, কোনো এক বিকেলে ফুসকা খাওয়া, অফিস শেষ করে এসে তোমার সাথে গল্প করা, তোমাকে কাজের মাঝে একটু সাহায্য করা, অফিসের সময়ে দুজনে মিলে একসাথে সিনেমা দেখা।
+   442→        </p>
+   443→        <p className="text-rose-700/90 leading-relaxed text-base">
+   444→          ভীষণ ইচ্ছে করে তোমাকে সাথে নিয়ে আমার প্রিয় ক্যাম্পাসটা ঘুরে দেখাই, যা আগের চেয়ে এখন অনেক বেশি সুন্দর হয়েছে।
+   445→        </p>
+   446→        <p className="text-rose-700/90 leading-relaxed text-base">
+   447→          আমি সবসময় আল্লাহর উপর বিশ্বাস রাখি, আর আলহামদুলিল্লাহ্‌ তিনি সবসময় সবকিছুর উত্তম ব্যবস্থা করে দেন। যেমন নতুন বাসায় আসার পর খরচ অনেকটা বেড়ে গিয়েছিল, কিন্তু ঠিক এক মাসের মাথায় আমার প্রোমোশন হয়ে গেল! আল্লাহর এই রহমত আমাকে নতুন করে আশা ও সাহস দেয়।
+   448→        </p>
+   449→      </div>
+   450→    ),
+   451→  },
+   452→  {
+   453→    id: 5,
+   454→    title: "এই অনুভূতিটা আমার কাছে নতুন",
+   455→    subtitle: "তোমাকে নিয়ে যতই ভাবি...",
+   456→    image: "/love-images/chapter5-new.png",
+   457→    bgGradient: "from-rose-50 via-pink-50 to-amber-50",
+   458→    content: (
+   459→      <div className="space-y-6">
+   460→        <div className="flex justify-center pt-2 text-center">
+   461→          <span className="font-cursive text-xl text-rose-400 leading-relaxed">
+   462→            তোমাকে নিয়ে যতই ভাবি<br />
+   463→            মনে হয় এই অনুভূতি আরও গভীরে<br />
+   464→            শুধু তোমার জন্যই বুঝি<br />
+   465→            ভালোবাসা কতটা সুন্দর
+   466→          </span>
+   467→        </div>
+   468→        <p className="text-rose-700/90 leading-relaxed text-base">
+   469→          এতগুলো ছোট ছোট স্বপ্ন বুনতে গিয়ে একটা বিষয় বারবার বুঝতে পারছি—আমার এই অনুভূতি শুধু ভালোলাগা নয়, এটা অনেক গভীর থেকে এসেছে।
+   470→        </p>
+   471→        <p className="text-rose-700/90 leading-relaxed text-base">
+   472→          আগে কখনো কাউকে নিয়ে এতভাবে ভাবিনি। কাউকে নিয়ে স্বপ্ন দেখা, কারো সাথে ভবিষ্যৎ কল্পনা করা—এসব আমার কাছে একদম নতুন।
+   473→        </p>
+   474→        <p className="text-rose-700/90 leading-relaxed text-base">
+   475→          শীতের সকালে তোমার সাথে ব্যাডমিন্টন খেলা, বিকেলে ফুসকা খাওয়া, অফিস শেষে তোমার সাথে গল্প করা—এই ছোট ছোট স্বপ্নগুলোই আমাকে বুঝিয়েছে যে আমি তোমাকে কতটা চাই।
+   476→        </p>
+   477→        <p className="text-rose-700/90 leading-relaxed text-base">
+   478→          তোমাকে নিয়ে যখন ভাবি, মনে হয় যেন সব কিছু স্বাভাবিক। যেন তুমি আমার জীবনের একটা অংশ হয়েই ছিলে।
+   479→        </p>
+   480→        <p className="text-rose-700/90 leading-relaxed text-base">
+   481→          জানি না ভবিষ্যতে কী হবে, কিন্তু একটা কথা নিশ্চিত—তোমাকে ভালোবাসার এই অনুভূতিটা আমার জীবনের সবচেয়ে সুন্দর অনুভূতি।
+   482→        </p>
+   483→        <p className="text-rose-700/90 leading-relaxed text-base">
+   484→          আর এই সুন্দর অনুভূতিটা শুধু তোমার জন্যই। তুমিই আমার জীবনে এই পরিবর্তনটা এনেছ।
+   485→        </p>
+   486→      </div>
+   487→    ),
+   488→  },
+   489→  {
+   490→    id: 6,
+   491→    title: "তোমার মতামতের অপেক্ষায়",
+   492→    subtitle: "জানি না কী বলবে তুমি এটা শুনে...",
+   493→    image: "/love-images/chapter5-proposal.png",
+   494→    bgGradient: "from-pink-50 via-rose-50 to-fuchsia-50",
+   495→    content: null,
+   496→  },
+   497→];
+   498→
+   499→/* ------------------------------------------------------------------ */
+   500→/*  CELEBRATION POPUP MODAL                                           */
+   501→/* ------------------------------------------------------------------ */
+   502→function CelebrationPopup({ open, onClose }: { open: boolean; onClose: () => void }) {
+   503→  useEffect(() => {
+   504→    if (!open) return;
+   505→    const timer = setTimeout(() => {
+   506→      onClose();
+   507→    }, 3000);
+   508→    return () => clearTimeout(timer);
+   509→  }, [open, onClose]);
+   510→
+   511→  return (
+   512→    <AnimatePresence>
+   513→      {open && (
+   514→        <motion.div
+   515→          initial={{ opacity: 0 }}
+   516→          animate={{ opacity: 1 }}
+   517→          exit={{ opacity: 0 }}
+   518→          transition={{ duration: 0.3 }}
+   519→          className="fixed inset-0 z-[100] flex items-center justify-center px-6"
+   520→        >
+   521→          {/* Backdrop */}
+   522→          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={onClose} />
+   523→
+   524→          {/* Modal */}
+   525→          <motion.div
+   526→            initial={{ opacity: 0, scale: 0.7, y: 30 }}
+   527→            animate={{ opacity: 1, scale: 1, y: 0 }}
+   528→            exit={{ opacity: 0, scale: 0.8, y: 20 }}
+   529→            transition={{ duration: 0.4, type: "spring", damping: 20 }}
+   530→            className="relative z-10 w-full max-w-sm"
+   531→          >
+   532→            <div className="glass rounded-3xl p-8 shadow-2xl shadow-rose-300/40 border border-rose-100/60 text-center">
+   533→              <SparklesOverlay />
+   534→
+   535→              <motion.div
+   536→                animate={{ scale: [1, 1.15, 1] }}
+   537→                transition={{ duration: 1, repeat: Infinity, ease: "easeInOut" }}
+   538→                className="mb-4"
+   539→              >
+   540→                <span className="text-5xl block">✨</span>
+   541→              </motion.div>
+   542→
+   543→              <h2 className="font-cursive text-3xl text-rose-500 mb-2">
+   544→                You Said Yes!
+   545→              </h2>
+   546→              <p className="text-rose-600/70 text-sm font-serif mb-1">
+   547→                This is the happiest moment of my life.
+   548→              </p>
+   549→              <p className="font-cursive text-lg text-rose-400">
+   550→                I love you, forever and always.
+   551→              </p>
+   552→
+   553→              <p className="text-xs text-rose-300/50 mt-5 font-serif">
+   554→                Closing automatically...
+   555→              </p>
+   556→            </div>
+   557→          </motion.div>
+   558→        </motion.div>
+   559→      )}
+   560→    </AnimatePresence>
+   561→  );
+   562→}
+   563→
+   564→/* ------------------------------------------------------------------ */
+   565→/*  PROPOSAL CHAPTER (Special)                                        */
+   566→/* ------------------------------------------------------------------ */
+   567→function ProposalChapter({ sessionId }: { sessionId: string }) {
+   568→  const [message, setMessage] = useState("");
+   569→  const messageDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+   570→
+   571→  // Debounced message save
+   572→  const handleMessageChange = useCallback(
+   573→    (value: string) => {
+   574→      setMessage(value);
+   575→      if (messageDebounceRef.current) clearTimeout(messageDebounceRef.current);
+   576→      if (value.trim()) {
+   577→        messageDebounceRef.current = setTimeout(() => {
+   578→          trackMessage(sessionId, value);
+   579→        }, 1500);
+   580→      }
+   581→    },
+   582→    [sessionId]
+   583→  );
+   584→
+   585→  const handleSend = useCallback(() => {
+   586→    if (message.trim()) {
+   587→      trackMessage(sessionId, message);
+   588→      setMessage("");
+   589→    }
+   590→  }, [sessionId, message]);
+   591→
+   592→  // Save message on unmount if there's content
+   593→  useEffect(() => {
+   594→    return () => {
+   595→      if (messageDebounceRef.current) clearTimeout(messageDebounceRef.current);
+   596→    };
+   597→  }, []);
+   598→
+   599→  return (
+   600→    <div className="relative">
+   601→      <div className="space-y-8 text-center">
+   602→        <div className="flex justify-center pt-2 text-center">
+   603→          <span className="font-cursive text-xl text-rose-400 leading-relaxed">
+   604→            জানি না কী বলবে তুমি এটা শুনে<br />
+   605→            তবুও ভালোবেসে যাবো চুপি সারে<br />
+   606→            জানিয়ে দিয়ো যদি ভালোবাসো তুমি<br />
+   607→            সাদা-মাটা প্রেমের চিঠিতে
+   608→          </span>
+   609→        </div>
+   610→
+   611→        <motion.div
+   612→          initial={{ opacity: 0, y: 20 }}
+   613→          animate={{ opacity: 1, y: 0 }}
+   614→          transition={{ duration: 0.8, delay: 0.3 }}
+   615→          className="text-left"
+   616→        >
+   617→          <p className="text-rose-700/90 leading-relaxed text-base">
+   618→            হয়তো মনের কথাগুলো খুব এলোমেলোভাবে বলে ফেললাম। আসলে এতদিন ধরে নিজের মধ্যে জমিয়ে রাখা কথাগুলো আজ একসাথে বলে ফেলতে চেয়েছি।
+   619→          </p>
+   620→          <p className="text-rose-700/90 leading-relaxed text-base">
+   621→            তবে আমি বিশ্বাস করি, যা কিছু হয় ভালোর জন্যই হয় এবং আল্লাহ্‌ পরম পরিকল্পনাকারী।
+   622→          </p>
+   623→
+   624→          <p className="text-rose-700/90 leading-relaxed text-base">
+   625→            তোমার মনের অনুভূতি যা-ই হোক না কেন, নির্দ্বিধায় আমাকে জানাতে পারো।
+   626→          </p>
+   627→          <p className="text-rose-700/90 leading-relaxed text-base">
+   628→            তোমার সিদ্ধান্ত হয়তো আমার মনের মতো হবে, হয়তো হবে না।
+   629→          </p>
+   630→          <p className="text-rose-700/90 leading-relaxed text-base">
+   631→            কিন্তু যেটাই হোক, আমি সবসময় তোমার সিদ্ধান্তের প্রতি শ্রদ্ধাশীল থাকব।
+   632→          </p>
+   633→          <p className="text-rose-700/90 leading-relaxed text-base">
+   634→            আমার আরেকটা ছোট অনুরোধ থাকবে—যদি বিষয়টা তোমার পছন্দ না হয়ে থাকে, তবে আমাকে ক্ষমা করে দিয়ো।
+   635→          </p>
+   636→          <p className="text-rose-700/90 leading-relaxed text-base">
+   637→            এই কথার প্রভাব যেন পরবর্তীতে আমাদের সম্পর্ক কিংবা তোমার পরিবারের ওপর না পড়ে।
+   638→          </p>
+   639→          <p className="text-rose-700/90 leading-relaxed text-base">
+   640→            আর আমি চাইব, এই অনুভূতিটা তুমি তোমার নিজের মধ্যেই সীমাবদ্ধ রাখো এবং পরিবারের সাথে শেয়ার না করো।
+   641→          </p>
+   642→          <p className="text-rose-700/90 leading-relaxed text-base">
+   643→            তুমি যদি আমার সাথে কথা বলতে চাও, তবে{" "}
+   644→            <span className="text-rose-500 font-medium">nusaiba.chat</span>{" "}
+   645→            ওয়েবসাইটে গিয়ে পাসওয়ার্ড হিসেবে তোমার নাম{" "}
+   646→            <span className="text-rose-500 font-medium">nusaiba</span>{" "}
+   647→            লিখে লগইন করে মেসেজ দিয়ো।
+   648→          </p>
+   649→          <p className="text-rose-700/90 leading-relaxed text-base">
+   650→            আমি সেই প্ল্যাটফর্মে তোমার অপেক্ষায় থাকব।
+   651→          </p>
+   652→        </motion.div>
+   653→
+   654→        {/* Textarea section */}
+   655→        <motion.div
+   656→          initial={{ opacity: 0, y: 20 }}
+   657→          animate={{ opacity: 1, y: 0 }}
+   658→          transition={{ duration: 0.6, delay: 0.6 }}
+   659→          className="pt-4"
+   660→        >
+   661→          <p className="font-cursive text-lg text-rose-500 mb-3">
+   662→            Say something about me
+   663→          </p>
+   664→          <div className="relative">
+   665→            <Textarea
+   666→              value={message}
+   667→              onChange={(e) => handleMessageChange(e.target.value)}
+   668→              placeholder="Write whatever..."
+   669→              className="min-h-[100px] rounded-2xl border-rose-200 bg-white/60 backdrop-blur-sm focus:bg-white/90 text-rose-800 placeholder:text-rose-300 font-serif text-sm resize-none pr-12"
+   670→            />
+   671→            <button
+   672→              onClick={handleSend}
+   673→              disabled={!message.trim()}
+   674→              className="absolute right-3 bottom-3 p-2 rounded-xl bg-rose-400 hover:bg-rose-500 text-white shadow-sm shadow-rose-300/40 transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed hover:scale-105"
+   675→              aria-label="Send message"
+   676→            >
+   677→              <Send className="w-4 h-4" />
+   678→            </button>
+   679→          </div>
+   680→        </motion.div>
+   681→      </div>
+   682→    </div>
+   683→  );
+   684→}
+   685→
+   686→/* ------------------------------------------------------------------ */
+   687→/*  CELEBRATION SCREEN                                                */
+   688→/* ------------------------------------------------------------------ */
+   689→function CelebrationScreen() {
+   690→  return (
+   691→    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-pink-50 via-rose-50 to-fuchsia-50">
+   692→      <FloatingPetals count={30} />
+   693→      <SparklesOverlay />
+   694→
+   695→      <motion.div
+   696→        initial={{ opacity: 0, y: 40 }}
+   697→        animate={{ opacity: 1, y: 0 }}
+   698→        transition={{ duration: 1, delay: 0.3 }}
+   699→        className="relative z-10 text-center px-6 max-w-md"
+   700→      >
+   701→        <motion.div
+   702→          animate={{ scale: [1, 1.15, 1] }}
+   703→          transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+   704→          className="mb-8"
+   705→        >
+   706→          <span className="text-7xl block mb-4">✨</span>
+   707→        </motion.div>
+   708→
+   709→        <h1 className="font-cursive text-5xl md:text-6xl text-rose-500 mb-6">
+   710→          Forever Yours
+   711→        </h1>
+   712→
+   713→        <div className="glass rounded-3xl p-8 shadow-xl shadow-rose-200/40 border border-rose-100/60 mb-6">
+   714→          <p className="font-cursive text-2xl text-rose-500 mb-3">
+   715→            Every love story is beautiful,
+   716→          </p>
+   717→          <p className="font-cursive text-2xl text-rose-400">
+   718→            but ours is my favorite.
+   719→          </p>
+   720→        </div>
+   721→
+   722→        <p className="text-rose-600/60 text-sm font-serif">
+   723→          This is just the beginning of our forever...
+   724→        </p>
+   725→      </motion.div>
+   726→    </div>
+   727→  );
+   728→}
+   729→
+   730→/* ------------------------------------------------------------------ */
+   731→/*  CHAPTER PAGE                                                      */
+   732→/* ------------------------------------------------------------------ */
+   733→function StoryPage() {
+   734→  const [currentChapter, setCurrentChapter] = useState(0);
+   735→  const [direction, setDirection] = useState(1);
+   736→  const sessionIdRef = useRef("");
+   737→  const enterTimeRef = useRef<number>(Date.now());
+   738→  const prevChapterRef = useRef(0);
+   739→
+   740→  // Init session
+   741→  useEffect(() => {
+   742→    sessionIdRef.current = getSessionId();
+   743→    enterTimeRef.current = Date.now();
+   744→  }, []);
+   745→
+   746→  const goToChapter = useCallback(
+   747→    (index: number) => {
+   748→      if (index < 0 || index >= chapters.length) return;
+   749→
+   750→      // Track the current chapter before leaving
+   751→      const chapter = chapters[prevChapterRef.current];
+   752→      const duration = Math.round((Date.now() - enterTimeRef.current) / 1000);
+   753→      trackVisit({
+   754→        sessionId: sessionIdRef.current,
+   755→        pageType: "chapter",
+   756→        chapterId: chapter.id,
+   757→        chapterTitle: chapter.title,
+   758→        durationSeconds: duration,
+   759→      });
+   760→
+   761→      setDirection(index > currentChapter ? 1 : -1);
+   762→      setCurrentChapter(index);
+   763→      enterTimeRef.current = Date.now();
+   764→      prevChapterRef.current = index;
+   765→
+   766→      // Scroll to top on chapter change
+   767→      window.scrollTo({ top: 0, behavior: "instant" });
+   768→    },
+   769→    [currentChapter]
+   770→  );
+   771→
+   772→  const goNext = useCallback(() => goToChapter(currentChapter + 1), [currentChapter, goToChapter]);
+   773→  const goPrev = useCallback(() => goToChapter(currentChapter - 1), [currentChapter, goToChapter]);
+   774→
+   775→  // Track when leaving the page (chapter 1 initial visit)
+   776→  useEffect(() => {
+   777→    const sid = sessionIdRef.current;
+   778→    return () => {
+   779→      const chapter = chapters[prevChapterRef.current];
+   780→      const duration = Math.round((Date.now() - enterTimeRef.current) / 1000);
+   781→      trackVisit({
+   782→        sessionId: sid,
+   783→        pageType: "chapter",
+   784→        chapterId: chapter.id,
+   785→        chapterTitle: chapter.title,
+   786→        durationSeconds: duration,
+   787→      });
+   788→    };
+   789→  }, []);
+   790→
+   791→  const chapter = chapters[currentChapter];
+   792→  const isProposal = currentChapter === chapters.length - 1;
+   793→  const progress = ((currentChapter + 1) / chapters.length) * 100;
+   794→
+   795→  const slideVariants = {
+   796→    enter: (dir: number) => ({ x: dir > 0 ? 300 : -300, opacity: 0 }),
+   797→    center: { x: 0, opacity: 1 },
+   798→    exit: (dir: number) => ({ x: dir > 0 ? -300 : 300, opacity: 0 }),
+   799→  };
+   800→
+   801→  return (
+   802→    <div
+   803→      className={`min-h-screen bg-gradient-to-br ${chapter.bgGradient} relative overflow-hidden`}
+   804→    >
+   805→      <FloatingPetals count={10} />
+   806→
+   807→      {/* Progress bar */}
+   808→      <div className="fixed top-0 left-0 right-0 z-50 h-1 bg-rose-100/50">
+   809→        <motion.div
+   810→          className="h-full bg-gradient-to-r from-rose-300 to-pink-400"
+   811→          initial={false}
+   812→          animate={{ width: `${progress}%` }}
+   813→          transition={{ duration: 0.5, ease: "easeInOut" }}
+   814→        />
+   815→      </div>
+   816→
+   817→      {/* Chapter counter */}
+   818→      <div className="fixed top-4 right-4 z-50 flex items-center gap-3">
+   819→        <span className="text-xs text-rose-400/60 font-serif bg-white/50 backdrop-blur-sm px-3 py-1 rounded-full">
+   820→          {currentChapter + 1} / {chapters.length}
+   821→        </span>
+   822→      </div>
+   823→
+   824→      {/* Main content area */}
+   825→      <div className="min-h-screen flex flex-col items-center justify-center px-4 py-16">
+   826→        <AnimatePresence mode="wait" custom={direction}>
+   827→          <motion.div
+   828→            key={currentChapter}
+   829→            custom={direction}
+   830→            variants={slideVariants}
+   831→            initial="enter"
+   832→            animate="center"
+   833→            exit="exit"
+   834→            transition={{ duration: 0.45, ease: "easeInOut" }}
+   835→            className="w-full max-w-md mx-auto"
+   836→          >
+   837→            {/* Chapter header */}
+   838→            <div className="text-center mb-8">
+   839→              <motion.p
+   840→                initial={{ opacity: 0, y: -10 }}
+   841→                animate={{ opacity: 1, y: 0 }}
+   842→                transition={{ delay: 0.2, duration: 0.5 }}
+   843→                className="text-xs uppercase tracking-widest text-rose-400/60 font-serif mb-2"
+   844→              >
+   845→                Chapter {chapter.id}
+   846→              </motion.p>
+   847→              <motion.h2
+   848→                initial={{ opacity: 0, y: -10 }}
+   849→                animate={{ opacity: 1, y: 0 }}
+   850→                transition={{ delay: 0.3, duration: 0.5 }}
+   851→                className="font-cursive text-3xl md:text-4xl text-rose-600 mb-2"
+   852→              >
+   853→                {chapter.title}
+   854→              </motion.h2>
+   855→              <motion.p
+   856→                initial={{ opacity: 0 }}
+   857→                animate={{ opacity: 1 }}
+   858→                transition={{ delay: 0.5, duration: 0.5 }}
+   859→                className="text-sm text-rose-400/70 font-serif italic"
+   860→              >
+   861→                {chapter.subtitle}
+   862→              </motion.p>
+   863→            </div>
+   864→
+   865→            {/* Chapter image */}
+   866→            <motion.div
+   867→              initial={{ opacity: 0, scale: 0.9 }}
+   868→              animate={{ opacity: 1, scale: 1 }}
+   869→              transition={{ delay: 0.2, duration: 0.6 }}
+   870→              className="relative w-full max-w-xs mx-auto mb-8 rounded-3xl overflow-hidden shadow-xl shadow-rose-200/30 aspect-[768/1344]"
+   871→            >
+   872→              <Image
+   873→                src={chapter.image}
+   874→                alt={chapter.title}
+   875→                fill
+   876→                className="object-cover"
+   877→                priority={currentChapter < 2}
+   878→              />
+   879→              <div className="absolute inset-0 bg-gradient-to-t from-white/20 to-transparent" />
+   880→            </motion.div>
+   881→
+   882→            {/* Chapter content */}
+   883→            <motion.div
+   884→              initial={{ opacity: 0, y: 20 }}
+   885→              animate={{ opacity: 1, y: 0 }}
+   886→              transition={{ delay: 0.4, duration: 0.6 }}
+   887→            >
+   888→              {isProposal ? (
+   889→                <ProposalChapter sessionId={sessionIdRef.current} />
+   890→              ) : (
+   891→                <div className="glass rounded-3xl p-6 md:p-8 shadow-lg shadow-rose-100/20 border border-rose-100/30">
+   892→                  {chapter.content}
+   893→                </div>
+   894→              )}
+   895→            </motion.div>
+   896→          </motion.div>
+   897→        </AnimatePresence>
+   898→
+   899→        {/* Navigation */}
+   900→        <div className="fixed bottom-0 left-0 right-0 z-50 pb-6 pt-8 bg-gradient-to-t from-white/60 via-white/30 to-transparent pointer-events-none">
+   901→          <div className="flex items-center justify-center gap-6 max-w-md mx-auto px-4 pointer-events-auto">
+   902→            <Button
+   903→              onClick={goPrev}
+   904→              disabled={currentChapter === 0}
+   905→              variant="outline"
+   906→              className="h-11 w-11 rounded-full border-rose-200 bg-white/70 backdrop-blur-sm text-rose-500 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-300 disabled:opacity-30 disabled:cursor-not-allowed shadow-sm transition-all duration-300"
+   907→              aria-label="Previous chapter"
+   908→            >
+   909→              <ChevronLeft className="w-5 h-5" />
+   910→            </Button>
+   911→
+   912→            {/* Dots indicator */}
+   913→            <div className="flex items-center gap-2">
+   914→              {chapters.map((_, i) => (
+   915→                <button
+   916→                  key={i}
+   917→                  onClick={() => goToChapter(i)}
+   918→                  className={`rounded-full transition-all duration-300 ${
+   919→                    i === currentChapter
+   920→                      ? "w-6 h-2.5 bg-rose-400 shadow-sm shadow-rose-300/50"
+   921→                      : "w-2.5 h-2.5 bg-rose-200/60 hover:bg-rose-300/80"
+   922→                  }`}
+   923→                  aria-label={`Go to chapter ${i + 1}`}
+   924→                />
+   925→              ))}
+   926→            </div>
+   927→
+   928→            <Button
+   929→              onClick={goNext}
+   930→              disabled={currentChapter === chapters.length - 1}
+   931→              variant="outline"
+   932→              className="h-11 w-11 rounded-full border-rose-200 bg-white/70 backdrop-blur-sm text-rose-500 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-300 disabled:opacity-30 disabled:cursor-not-allowed shadow-sm transition-all duration-300"
+   933→              aria-label="Next chapter"
+   934→            >
+   935→              <ChevronRight className="w-5 h-5" />
+   936→            </Button>
+   937→          </div>
+   938→        </div>
+   939→      </div>
+   940→    </div>
+   941→  );
+   942→}
+   943→
+   944→/* ------------------------------------------------------------------ */
+   945→/*  MAIN PAGE                                                         */
+   946→/* ------------------------------------------------------------------ */
+   947→export default function LovePage() {
+   948→  const [isLoggedIn, setIsLoggedIn] = useState(false);
+   949→
+   950→  if (!isLoggedIn) {
+   951→    return <LoginScreen onLogin={() => setIsLoggedIn(true)} />;
+   952→  }
+   953→
+   954→  return <StoryPage />;
+   955→}
+   956→

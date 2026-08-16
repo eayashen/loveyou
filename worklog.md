@@ -23,3 +23,22 @@ Stage Summary:
 - Chapter 5 is the proposal with "Yes!" button and celebration popup
 - Visit tracking and message tracking working via Prisma/SQLite
 - All framer-motion animations, floating petals, sparkles, glass effects confirmed working
+
+---
+Task ID: 2-a
+Agent: Main Agent
+Task: Update Chapter 6 - change title, remove picture, strip text, keep text box
+
+Work Log:
+- Changed Chapter 6 title from "তোমার মতামতের অপেক্ষায়" to "Say something about me"
+- Changed subtitle to "তোমার কথা শুনতে অপেক্ষায় আছি..."
+- Set Chapter 6 image to empty string (removed picture)
+- Added conditional rendering for chapter image (only shows when image is non-empty)
+- Stripped ProposalChapter component: removed poem and all paragraphs
+- Kept only the two nusaiba.chat lines and the "Say something about me" textarea
+- Verified with agent-browser: 6 chapters, Chapter 6 shows title, nusaiba.chat text, and text box correctly
+
+Stage Summary:
+- Chapter 6 now shows: title "Say something about me", nusaiba.chat login instructions, and text area
+- No image on Chapter 6
+- All previous chapters (1-5) unchanged

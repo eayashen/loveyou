@@ -488,9 +488,9 @@ const chapters: Chapter[] = [
   },
   {
     id: 6,
-    title: "তোমার মতামতের অপেক্ষায়",
-    subtitle: "জানি না কী বলবে তুমি এটা শুনে...",
-    image: "/love-images/chapter5-proposal.png",
+    title: "Say something about me",
+    subtitle: "তোমার কথা শুনতে অপেক্ষায় আছি...",
+    image: "",
     bgGradient: "from-pink-50 via-rose-50 to-fuchsia-50",
     content: null,
   },
@@ -599,46 +599,12 @@ function ProposalChapter({ sessionId }: { sessionId: string }) {
   return (
     <div className="relative">
       <div className="space-y-8 text-center">
-        <div className="flex justify-center pt-2 text-center">
-          <span className="font-cursive text-xl text-rose-400 leading-relaxed">
-            জানি না কী বলবে তুমি এটা শুনে<br />
-            তবুও ভালোবেসে যাবো চুপি সারে<br />
-            জানিয়ে দিয়ো যদি ভালোবাসো তুমি<br />
-            সাদা-মাটা প্রেমের চিঠিতে
-          </span>
-        </div>
-
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.3 }}
           className="text-left"
         >
-          <p className="text-rose-700/90 leading-relaxed text-base">
-            হয়তো মনের কথাগুলো খুব এলোমেলোভাবে বলে ফেললাম। আসলে এতদিন ধরে নিজের মধ্যে জমিয়ে রাখা কথাগুলো আজ একসাথে বলে ফেলতে চেয়েছি।
-          </p>
-          <p className="text-rose-700/90 leading-relaxed text-base">
-            তবে আমি বিশ্বাস করি, যা কিছু হয় ভালোর জন্যই হয় এবং আল্লাহ্‌ পরম পরিকল্পনাকারী।
-          </p>
-
-          <p className="text-rose-700/90 leading-relaxed text-base">
-            তোমার মনের অনুভূতি যা-ই হোক না কেন, নির্দ্বিধায় আমাকে জানাতে পারো।
-          </p>
-          <p className="text-rose-700/90 leading-relaxed text-base">
-            তোমার সিদ্ধান্ত হয়তো আমার মনের মতো হবে, হয়তো হবে না।
-          </p>
-          <p className="text-rose-700/90 leading-relaxed text-base">
-            কিন্তু যেটাই হোক, আমি সবসময় তোমার সিদ্ধান্তের প্রতি শ্রদ্ধাশীল থাকব।
-          </p>
-          <p className="text-rose-700/90 leading-relaxed text-base">
-            আমার আরেকটা ছোট অনুরোধ থাকবে—যদি বিষয়টা তোমার পছন্দ না হয়ে থাকে, তবে আমাকে ক্ষমা করে দিয়ো।
-          </p>
-          <p className="text-rose-700/90 leading-relaxed text-base">
-            এই কথার প্রভাব যেন পরবর্তীতে আমাদের সম্পর্ক কিংবা তোমার পরিবারের ওপর না পড়ে।
-          </p>
-          <p className="text-rose-700/90 leading-relaxed text-base">
-            আর আমি চাইব, এই অনুভূতিটা তুমি তোমার নিজের মধ্যেই সীমাবদ্ধ রাখো এবং পরিবারের সাথে শেয়ার না করো।
-          </p>
           <p className="text-rose-700/90 leading-relaxed text-base">
             তুমি যদি আমার সাথে কথা বলতে চাও, তবে{" "}
             <span className="text-rose-500 font-medium">nusaiba.chat</span>{" "}
@@ -863,6 +829,7 @@ function StoryPage() {
             </div>
 
             {/* Chapter image */}
+            {chapter.image && (
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -878,6 +845,7 @@ function StoryPage() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-white/20 to-transparent" />
             </motion.div>
+            )}
 
             {/* Chapter content */}
             <motion.div
