@@ -395,7 +395,16 @@ const chapters: Chapter[] = [
           মা প্রায়ই বিয়ের কথা বলেন। আমি মাকে বলেছি— "আমি মনে মনে একজনকে পছন্দ করি। তাঁকে কোনোদিন বলতে পারলে বলব, আর না হয় তোমার কথাই মেনে নেব।" তোমাকে পাওয়ার এই নীরব অপেক্ষাটা আমার নিজের ইচ্ছেতেই।
         </p>
         <p className="text-rose-700/90 leading-relaxed text-base">
-          আমি জানি, তোমার সামনে এখন অ্যাডমিশন জার্নি, তোমার অনেক বড় বড় স্বপ্ন রয়েছে। আমি কখনোই তোমার স্বপ্নের পথে বাধা হতে চাই না, বরং তোমার পাশে থেকে তোমাকে অলওয়েজ সাপোর্ট করতে চাই। তুমি যদি এখন পড়াশোনা নিয়ে ব্যস্ত থাকতে চাও কিংবা এই মুহূর্তে প্রস্তুত না থাকো, আমি তোমার জন্য অপেক্ষা করতে রাজি আছি। এমনকি তুমি যদি চার বছর পড়াশোনা শেষ করে তারপর কোনো সিদ্ধান্ত নিতে চাও, আমি এতদিন ধরেও তোমার জন্য অপেক্ষা করব। এই সময়ে আমি নিজেকে আরও ভালোভাবে তৈরি করে ফেলব— হয় উচ্চশিক্ষার জন্য দেশের বাইরে যাওয়া, কিংবা দেশে সরকারি চাকরির মতো আরও ভালো কিছু করার প্রস্তুতি নেওয়া।
+          আমি জানি, তোমার সামনে এখন অ্যাডমিশন জার্নি, তোমার অনেক বড় বড় স্বপ্ন রয়েছে। আমি কখনোই তোমার স্বপ্নের পথে বাধা হতে চাই না।
+        </p>
+        <p className="text-rose-700/90 leading-relaxed text-base">
+          বরং তোমার পাশে থেকে তোমাকে অলওয়েজ সাপোর্ট করতে চাই। তুমি যদি এখন পড়াশোনা নিয়ে ব্যস্ত থাকতে চাও কিংবা এই মুহূর্তে প্রস্তুত না থাকো, আমি তোমার জন্য অপেক্ষা করতে রাজি আছি।
+        </p>
+        <p className="text-rose-700/90 leading-relaxed text-base">
+          এমনকি তুমি যদি চার বছর পড়াশোনা শেষ করে তারপর কোনো সিদ্ধান্ত নিতে চাও, আমি এতদিন ধরেও তোমার জন্য অপেক্ষা করব।
+        </p>
+        <p className="text-rose-700/90 leading-relaxed text-base">
+          এই সময়ে আমি নিজেকে আরও ভালোভাবে তৈরি করে ফেলব— হয় উচ্চশিক্ষার জন্য দেশের বাইরে যাওয়া, কিংবা দেশে সরকারি চাকরির মতো আরও ভালো কিছু করার প্রস্তুতি নেওয়া।
         </p>
       </div>
     ),
@@ -552,8 +561,6 @@ function ProposalChapter({ sessionId }: { sessionId: string }) {
 
   return (
     <div className="relative">
-      <SparklesOverlay />
-
       <div className="space-y-8 text-center">
         <div className="flex justify-center pt-2 text-center">
           <span className="font-cursive text-xl text-rose-400 leading-relaxed">
@@ -576,17 +583,37 @@ function ProposalChapter({ sessionId }: { sessionId: string }) {
           <p className="text-rose-700/90 leading-relaxed text-base">
             তবে আমি বিশ্বাস করি, যা কিছু হয় ভালোর জন্যই হয় এবং আল্লাহ্‌ পরম পরিকল্পনাকারী।
           </p>
+
+          {/* Relevant image in the text */}
+          <div className="my-6 flex justify-center">
+            <div className="relative w-full max-w-[220px] rounded-2xl overflow-hidden shadow-lg shadow-rose-200/30 aspect-[3/4]">
+              <Image
+                src="/love-images/chapter4-everything.png"
+                alt="একসাথে স্বপ্ন"
+                fill
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-white/20 to-transparent" />
+            </div>
+          </div>
+
           <p className="text-rose-700/90 leading-relaxed text-base">
-            তোমার মনের অনুভূতি যা-ই হোক না কেন, নির্দ্বিধায় আমাকে জানাতে পারো। তোমার সিদ্ধান্ত হয়তো আমার মনের মতো হবে, হয়তো হবে না—কিন্তু যেটাই হোক, আমি সবসময় তোমার সিদ্ধান্তের প্রতি শ্রদ্ধাশীল থাকব।
+            তোমার মনের অনুভূতি যা-ই হোক না কেন, নির্দ্বিধায় আমাকে জানাতে পারো।
           </p>
           <p className="text-rose-700/90 leading-relaxed text-base">
-            আমার আরেকটা ছোট অনুরোধ থাকবে—যদি বিষয়টা তোমার পছন্দ না হয়ে থাকে, তবে আমাকে ক্ষমা করে দিয়ো। এই কথার প্রভাব যেন পরবর্তীতে আমাদের সম্পর্ক কিংবা তোমার পরিবারের ওপর না পড়ে। আর আমি চাইব, এই অনুভূতিটা তুমি তোমার নিজের মধ্যেই সীমাবদ্ধ রাখো এবং পরিবারের সাথে শেয়ার না করো।
+            তোমার সিদ্ধান্ত হয়তো আমার মনের মতো হবে, হয়তো হবে না—কিন্তু যেটাই হোক, আমি সবসময় তোমার সিদ্ধান্তের প্রতি শ্রদ্ধাশীল থাকব।
+          </p>
+          <p className="text-rose-700/90 leading-relaxed text-base">
+            আমার আরেকটা ছোট অনুরোধ থাকবে—যদি বিষয়টা তোমার পছন্দ না হয়ে থাকে, তবে আমাকে ক্ষমা করে দিয়ো।
+          </p>
+          <p className="text-rose-700/90 leading-relaxed text-base">
+            এই কথার প্রভাব যেন পরবর্তীতে আমাদের সম্পর্ক কিংবা তোমার পরিবারের ওপর না পড়ে। আর আমি চাইব, এই অনুভূতিটা তুমি তোমার নিজের মধ্যেই সীমাবদ্ধ রাখো এবং পরিবারের সাথে শেয়ার না করো।
           </p>
           <p className="text-rose-700/90 leading-relaxed text-base">
             তুমি যদি আমার সাথে কথা বলতে চাও, তবে{" "}
-            <span className="font-cursive text-rose-500">nusaiba.chat</span>{" "}
+            <span className="text-rose-500 font-medium">nusaiba.chat</span>{" "}
             ওয়েবসাইটে গিয়ে পাসওয়ার্ড হিসেবে তোমার নাম{" "}
-            <span className="font-cursive text-rose-500">nusaiba</span>{" "}
+            <span className="text-rose-500 font-medium">nusaiba</span>{" "}
             লিখে লগইন করে মেসেজ দিয়ো; আমি সেই প্ল্যাটফর্মে তোমার অপেক্ষায় থাকব।
           </p>
         </motion.div>
