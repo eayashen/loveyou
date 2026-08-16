@@ -300,28 +300,31 @@ interface Chapter {
 const chapters: Chapter[] = [
   {
     id: 1,
-    title: "The Day We Met",
-    subtitle: "Where everything began...",
+    title: "তোমাকেই প্রথম বলা",
+    subtitle: "আরে হাই, কিছু কথা ছিল মাথায়...",
     image: "/love-images/chapter1-meet.png",
     bgGradient: "from-rose-50 via-pink-50 to-orange-50",
     content: (
       <div className="space-y-6">
         <p className="text-rose-700/90 leading-relaxed text-base">
-          Some moments change your life forever, and you don&apos;t even know it at the time.
-          That&apos;s exactly how it was the day I met you.
+          আরে হাই, কিছু কথা ছিল মাথায়
+          <br />
+          যা আমি বলে দিতে চাই।
+          <br />
+          কিন্তু উপায় কোথায়?
         </p>
         <p className="text-rose-700/90 leading-relaxed text-base">
-          I remember every little detail — the way the light caught your smile,
-          the sound of your laugh, and that feeling in my chest that said{" "}
-          <span className="font-cursive text-rose-500 text-xl">&ldquo;this is it.&rdquo;</span>
+          আমি জানি না কীভাবে শুরু করা উচিত, তবে আজ নিজের মনের কথাগুলো তোমাকে না বললে হয়তো সারাজীবন একটা আফসোস থেকে যাবে—কেন সেদিন সাহস করে সত্যিটা বললাম না!
         </p>
         <p className="text-rose-700/90 leading-relaxed text-base">
-          I didn&apos;t know it yet, but my world had just shifted on its axis.
-          From that very first moment, you became the most beautiful part of my story.
+          সত্যি বলতে, কাউকে আলাদা করে পছন্দ করা বা নিজের মতো করে কাউকে খোঁজার চিন্তা আমার কখনোই ছিল না। ভেবেছিলাম, মা যাঁর সাথে বিয়ের কথা বলবেন, তাঁকেই গ্রহণ করে নিজের মতো গুছিয়ে চলব।
         </p>
-        <div className="flex justify-center pt-2">
-          <span className="font-cursive text-2xl text-rose-400">You walked in, and I knew.</span>
-        </div>
+        <p className="text-rose-700/90 leading-relaxed text-base">
+          কিন্তু তোমাকে দেখার পর আমার সেই স্বাভাবিক চিন্তাগুলো একদম বদলে গেল।
+        </p>
+        <p className="text-rose-700/90 leading-relaxed text-base">
+          আমি বিষয়টা পারিবারিকভাবে তোমার পরিবারকে জানাতে পারতাম। কিন্তু আমার মনে হলো, যাকে নিয়ে আমি স্বপ্ন দেখছি, তাঁর মতামতটাই তো সবার আগে নেওয়া দরকার। তোমার পছন্দ-অপছন্দের একটি বড় বিষয় আছে; তাই সেটিকে সর্বোচ্চ সম্মান জানিয়ে এবং যাকে মনে মনে এতটা ভালোবেসে ফেলেছি তার জন্য স্পেশাল কিছু করার ইচ্ছা থেকেই এইভাবে তোমাকে জানালাম।
+        </p>
       </div>
     ),
   },
