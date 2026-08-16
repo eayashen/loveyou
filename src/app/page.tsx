@@ -306,8 +306,8 @@ const chapters: Chapter[] = [
     bgGradient: "from-rose-50 via-pink-50 to-orange-50",
     content: (
       <div className="space-y-6">
-        <div className="flex justify-center pt-2">
-          <span className="font-cursive text-2xl text-rose-400">
+        <div className="flex justify-center pt-2 text-center">
+          <span className="font-cursive text-xl text-rose-400 leading-relaxed">
             আরে হাই, কিছু কথা ছিল মাথায়<br />
             যা আমি বলে দিতে চাই।<br />
             কিন্তু উপায় কোথায়?
@@ -336,8 +336,8 @@ const chapters: Chapter[] = [
     bgGradient: "from-amber-50 via-rose-50 to-pink-50",
     content: (
       <div className="space-y-6">
-        <div className="flex justify-center pt-2">
-          <span className="font-cursive text-2xl text-rose-400">
+        <div className="flex justify-center pt-2 text-center">
+          <span className="font-cursive text-xl text-rose-400 leading-relaxed">
             ওয়েট, না, প্রথম দেখাতে ভালোবাসিনি আমি!<br />
             তবে ধীরে-ধীরে জাগলো এই অনুভূতি।<br />
             আমি সারাদিন ভেবে এই ভাবেই<br />
