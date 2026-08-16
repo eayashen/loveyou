@@ -221,9 +221,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
               Just for You
             </h1>
             <p className="text-sm text-rose-400/80 font-serif">
-              This is something I made with all my heart.
-              <br />
-              Enter the secret word to continue...
+              Written with nothing but truth...
             </p>
           </div>
 
@@ -234,7 +232,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
               <Input
                 ref={inputRef}
                 type={showPassword ? "text" : "password"}
-                placeholder="Your secret word..."
+                placeholder="Secret key.."
                 value={password}
                 onChange={(e) => {
                   setPassword(e.target.value);
@@ -275,16 +273,13 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
                   className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
                 />
               ) : (
-                "Open My Heart"
+                "Decrypt >>>"
               )}
             </Button>
           </form>
         </div>
 
-        {/* Footer text */}
-        <p className="text-center text-xs text-rose-300/60 mt-6 font-serif">
-          Made with love, just for you
-        </p>
+
       </motion.div>
     </div>
   );
