@@ -277,8 +277,11 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
               )}
             </Button>
           </form>
-        </div>
 
+        </div>
+        <p className="text-center text-xs text-rose-300/60 mt-6 font-serif">
+          Find the encrypted key using your registration number in hexa format
+        </p>
 
       </motion.div>
     </div>
@@ -340,7 +343,7 @@ const chapters: Chapter[] = [
     content: (
       <div className="space-y-6">
         <div className="flex justify-center pt-2 text-center">
-          <span className="font-cursive text-xl text-rose-400 leading-relaxed">
+          <span className="font-cursive text-lg text-rose-400 leading-relaxed">
             ওয়েট, না, প্রথম দেখাতে ভালোবাসিনি আমি!<br />
             তবে ধীরে-ধীরে জাগলো এই অনুভূতি।<br />
             আমি সারাদিন ভেবে এই ভাবেই<br />
@@ -354,7 +357,7 @@ const chapters: Chapter[] = [
           তোমার সাথে আমার অনেক মিল খুঁজে পাই। তুমি চুপচাপ থাকতে পছন্দ করো, তোমাকে কেউ ডিস্টার্ব না করুক এটা তুমি চাও, তোমার পছন্দ খুবই সিম্পল, আর তুমি কোনো কিছু নিয়ে অতিরিক্ত টেনশন করো না—'যা হওয়ার হবে' ভেবে খুব ঠান্ডা থাকতে পারো। তোমার এই স্বভাবগুলো আমার খুব ভালো লাগে।
         </p>
         <p className="text-rose-700/90 leading-relaxed text-base">
-          মনে আছে? ক্লাসে তোমাদের একটা কাপলদের ভিডিও দেখিয়েছিলাম? তাদের ভিডিও আমার সামনে আসলেই কেবল তোমার কথাই মনে পড়ে। কোনো এক অজানা কারণে আমি এমন একটা জায়গায় আটকে গেছি, যেখান থেকে অন্য কোনো দিকে আর মন দিতে পারিছি না।
+          মনে আছে? ক্লাসে তোমাদের একটা কাপলদের ভিডিও দেখিয়েছিলাম? তাদের ভিডিও আমার সামনে আসলেই কেবল তোমার কথাই মনে পড়ে। কোনো এক অজানা কারণে আমি এমন একটা জায়গায় আটকে গেছি, যেখান থেকে অন্য কোনো দিকে আর মন দিতে পারছি না।
         </p>
         <p className="text-rose-700/90 leading-relaxed text-base">
           বেশ অনেক দিন আগে ‘কাছের মানুষ দূরে থুইয়া’ সিনেমাটা দেখার সময় মনে হচ্ছিল—সিনেমার সেই দুজন মানুষের গল্পের মতো যদি আমাদের গল্পটাও হতো! তোমাকে সিনেমাটা দেখার অনুরোধ রইল।
@@ -421,7 +424,7 @@ const chapters: Chapter[] = [
     content: (
       <div className="space-y-6">
         <div className="flex justify-center pt-2 text-center">
-          <span className="font-cursive text-xl text-rose-400 leading-relaxed">
+          <span className="font-cursive text-lg text-rose-400 leading-relaxed">
             বলবো, বলবো করে বলা হয়নি<br />
             কপালে যাই থাকুক না কেন বলবো ভাবছি<br />
             এই কিছু কথা মনে যা আগে বলা হয়নি<br />
