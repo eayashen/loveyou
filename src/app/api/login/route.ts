@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { dbConnect } from "@/lib/mongodb";
 import { FailedLogin } from "@/lib/models";
 
-const SECRET_PASSWORD = "7DD1F911";
+const SECRET_PASSWORD = "2110912785";
 
 function getClientInfo(request: NextRequest) {
   return {

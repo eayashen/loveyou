@@ -280,7 +280,7 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
 
         </div>
         <p className="text-center text-xs text-rose-300/60 mt-6 font-serif">
-          Find the encrypted key using your registration number in hexa format
+          Encrypted key using your registration number
         </p>
 
       </motion.div>
